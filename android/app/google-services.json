@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "498273919331",
+    "project_id": "studienarbeit-focusapp",
+    "storage_bucket": "studienarbeit-focusapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:498273919331:android:325ff250552c9a685ff356",
+        "android_client_info": {
+          "package_name": "com.focus_app.studienarbeit_focus_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-aKtaW0yOkgGEppr4L4ARVesv3l7p8ws"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAnQ5inUnll1RU9DgSUvRfyR89Qkc0ssv8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>498273919331</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.focusapp.studienarbeitFocusApp</string>
+	<key>PROJECT_ID</key>
+	<string>studienarbeit-focusapp</string>
+	<key>STORAGE_BUCKET</key>
+	<string>studienarbeit-focusapp.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:498273919331:ios:e1f4112b9691d4525ff356</string>
+</dict>
+</plist>
