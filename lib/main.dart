@@ -33,10 +33,7 @@ class MyApp extends StatelessWidget {
             return LoadingScreen();
           } else {
             if (snapshot.hasData) {
-              return ChangeNotifierProvider(
-                create: (context) => AuthProvider(),
-                child: HomePage(),
-              );
+              return HomePage();
             } else {
               return AuthenticationPage();
             }
