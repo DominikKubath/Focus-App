@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'FirestoreManager.dart';
 import 'Utils.dart';
 import 'BasePage.dart';
 
@@ -79,6 +80,7 @@ class LoginPageState extends State<LoginPage> {
                               email: emailController.text,
                               password: passwordController.text)
                               .then((value) {
+                            FirestoreManager().SaveUserId(value, context);
                             Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(

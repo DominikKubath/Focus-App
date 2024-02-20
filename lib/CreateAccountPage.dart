@@ -1,7 +1,9 @@
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:studienarbeit_focus_app/FirestoreManager.dart';
 import 'Utils.dart';
 import 'BasePage.dart';
 
@@ -106,6 +108,7 @@ class CreateAccountPageState extends State<CreateAccountPage> {
                 }
 
                 FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password).then((user) {
+                  FirestoreManager().SaveUserId(user, context);
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => HomePage()));
                 }).onError((FirebaseAuthException error, stackTrace) {
