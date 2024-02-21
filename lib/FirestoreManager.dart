@@ -8,11 +8,18 @@ import 'dart:js';
 import 'dart:html' as html;
 
 import 'package:flutter/material.dart';
+import 'package:studienarbeit_focus_app/UserInfo.dart';
 
 class FirestoreManager {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  CollectionReference userCollection = _firestore.collection("user");
 
-
+  void CreateFirestoreUser(name, email, id) async
+  {
+    FSUser user = FSUser(name, email);
+    user.id = id;
+    userCollection.add(user.ToMap());
+  }
 
   void SaveUserId(UserCredential userCredentials, BuildContext context) async
   {
@@ -20,7 +27,6 @@ class FirestoreManager {
     var id = userCredentials.user?.uid;
     id ??= ""; //If id == null => ""
     if(kIsWeb){
-      html.document.cookie = 'test=something';
       html.document.cookie = 'uid=$id';
     }
     else if (Theme.of(context).platform == TargetPlatform.android) {

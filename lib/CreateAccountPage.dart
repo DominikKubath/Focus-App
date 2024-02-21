@@ -15,6 +15,7 @@ class CreateAccountPage extends StatefulWidget{
 }
 
 class CreateAccountPageState extends State<CreateAccountPage> {
+  TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController passwordConfirmationController = TextEditingController();
@@ -33,6 +34,13 @@ class CreateAccountPageState extends State<CreateAccountPage> {
         width: screenWidth,
         margin: EdgeInsets.fromLTRB(0, 0, 0, 60),
         child: Text("Willkommen!", style: GoogleFonts.montserrat(fontSize: 48), textAlign: TextAlign.center,),),
+      Container(
+          margin: EdgeInsets.fromLTRB(40, 0, 40, 0),
+          child: TextFormField(
+            controller: nameController,
+            decoration: InputDecoration(enabledBorder: UnderlineInputBorder(),
+                hintText: "Your Name", hintStyle: GoogleFonts.montserrat(color: Colors.grey)),
+            keyboardType: TextInputType.text,)),
       Container(
         width: screenWidth,
         margin: EdgeInsets.fromLTRB(40, 0, 0, 0),
@@ -72,6 +80,7 @@ class CreateAccountPageState extends State<CreateAccountPage> {
               style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Utils().getColorFromHex("FF7A3D")), shape: MaterialStateProperty.all( RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(40)))),
               onPressed: () async {
+                String name = nameController.text;
                 String email = emailController.text;
                 String password = passwordController.text;
                 String passwordConfirmation = passwordConfirmationController.text;
@@ -109,6 +118,7 @@ class CreateAccountPageState extends State<CreateAccountPage> {
 
                 FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password).then((user) {
                   FirestoreManager().SaveUserId(user, context);
+                  FirestoreManager().CreateFirestoreUser(name, email, user.user?.uid);
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => HomePage()));
                 }).onError((FirebaseAuthException error, stackTrace) {

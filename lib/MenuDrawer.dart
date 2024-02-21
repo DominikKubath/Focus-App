@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'ToDoListPage.dart';
+import 'FlashCardsPage.dart';
 
 
 class MenuDrawer extends StatelessWidget {
@@ -33,6 +34,13 @@ class MenuDrawer extends StatelessWidget {
                 Navigator.pop(context); // Close the drawer
               },
             ),
+            ListTile(
+              title: Text("Flash Cards"),
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => FlashCardsPage())
+                );
+              },
+            )
           ],
         ),
       );
