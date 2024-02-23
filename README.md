@@ -1,16 +1,10 @@
-# studienarbeit_focus_app
+# FOCUS | Studienarbeit-App 
 
-Eine Anwendung, die im Rahmen der Studienarbeit entwickelt wurde, um die Lernleistung zu erhöhen
+Eine Flutter-Anwendung, die im Rahmen der Studienarbeit entwickelt wurde, um die Lernleistung zu erhöhen
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+- [Link zum Firebase Setup](https://console.firebase.google.com/u/0/project/studienarbeit-focusapp/firestore/data/~2Fuser~2FjN8rU3x8Du4JDHzrdWOE)
+- [Link zum Android Studio donwload](https://developer.android.com/studio)
+- [Link zum Flutter Dekstop Plugin Setup](https://docs.flutter.dev/get-started/install/windows/desktop)
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
