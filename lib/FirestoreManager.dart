@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:html' as html;
 
 import 'package:flutter/material.dart';
-import 'package:studienarbeit_focus_app/UserInfo.dart';
+import 'package:studienarbeit_focus_app/Classes/UserInfo.dart';
 
 class FirestoreManager {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;

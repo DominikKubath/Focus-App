@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:studienarbeit_focus_app/FirestoreManager.dart';
-import 'Utils.dart';
+import '../Classes/Utils.dart';
 import 'BasePage.dart';
 
 class CreateAccountPage extends StatefulWidget{

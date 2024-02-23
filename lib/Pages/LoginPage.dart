@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'FirestoreManager.dart';
-import 'Utils.dart';
-import 'BasePage.dart';
+import '../FirestoreManager.dart';
+import '../Classes/Utils.dart';
+import './BasePage.dart';
 
 class LoginPage extends StatefulWidget{
   LoginPage({Key? key}) : super(key: key);

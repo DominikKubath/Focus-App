@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:studienarbeit_focus_app/FirestoreManager.dart';
 import 'firebase_options.dart';
 
-import 'BasePage.dart';
-import 'AuthenticationPage.dart';
-import 'UserInfo.dart';
+import 'Pages/BasePage.dart';
+import 'Pages/AuthenticationPage.dart';
+import 'Classes/UserInfo.dart';
 import 'LoadingScreen.dart';
 
 

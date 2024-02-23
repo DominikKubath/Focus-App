@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:studienarbeit_focus_app/MenuDrawer.dart';
+import '../UI Elements/MenuDrawer.dart';
 
-class HomePage extends StatefulWidget {
+class ToDoListPage extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _ToDoListPageState createState() => _ToDoListPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _ToDoListPageState extends State<ToDoListPage> {
   bool isMenuOpen = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Page'),
+        title: Text('To Do Liste'),
       ),
       drawer: MenuDrawer(),
       body: Container(
         child: Center(
-          child: Text('Home Page'),
+          child: Text('ToDoListPage'),
         ),
       ),
       floatingActionButton: FloatingActionButton(

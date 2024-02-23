@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:studienarbeit_focus_app/AuthenticationPage.dart';
-import 'FirestoreManager.dart';
-import 'ToDoListPage.dart';
-import 'FlashCardsPage.dart';
+import 'package:studienarbeit_focus_app/Pages/AuthenticationPage.dart';
+import '../FirestoreManager.dart';
+import '../Pages/ToDoListPage.dart';
+import '../Pages/FlashCardsPage.dart';
 
 
 class MenuDrawer extends StatelessWidget {
