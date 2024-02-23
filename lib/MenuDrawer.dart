@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:studienarbeit_focus_app/AuthenticationPage.dart';
+import 'FirestoreManager.dart';
 import 'ToDoListPage.dart';
 import 'FlashCardsPage.dart';
 
@@ -40,7 +42,19 @@ class MenuDrawer extends StatelessWidget {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => FlashCardsPage())
                 );
               },
-            )
+            ),
+            ListTile(
+              title: Text("Abmelden"),
+              onTap: (){
+                FirestoreManager().LogOut(context);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AuthenticationPage(),
+                    ),
+                        (Route<dynamic> route) => false);
+              }
+            ),
           ],
         ),
       );
