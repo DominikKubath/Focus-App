@@ -1,6 +1,7 @@
 import 'dart:js_interop';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -10,9 +11,27 @@ import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:studienarbeit_focus_app/Classes/UserInfo.dart';
 
+import 'Classes/FlashCardDeck.dart';
+
 class FirestoreManager {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   CollectionReference userCollection = _firestore.collection("user");
+
+
+  Future<List<FlashCardDeck>> GetAllFlashCardDecks(String uid) async
+  {
+    var userDocument = await userCollection.where("uid", isEqualTo: uid).get();
+    return await userCollection.doc(userDocument.docs[0].id).collection("flashcards").get().then((value){
+      List<FlashCardDeck> decks = [];
+      value.docs.forEach((element) {
+        debugPrint("GOT DECK " + element.data().toString());
+        decks.add(FlashCardDeck.fromDoc(element));
+      });
+      return decks;
+    });
+  }
+
+
 
   void CreateFirestoreUser(name, email, id) async
   {
@@ -21,10 +40,11 @@ class FirestoreManager {
     userCollection.add(user.ToMap());
   }
 
-  FSUser GetUserData(String uid)
+  Future<FSUser> GetUserData(String uid) async
   {
-    DocumentSnapshot<Object?> userData = userCollection.where("uid", isEqualTo: uid).get() as DocumentSnapshot<Object?>;
-    return FSUser.fromDoc(userData);
+    return await userCollection.where("uid", isEqualTo: uid).get().then((value){
+      return FSUser.fromDoc(value.docs[0]);
+    });
   }
 
   void SaveUserId(UserCredential userCredentials, BuildContext context) async
