@@ -21,7 +21,7 @@ class _DeckContentPageState extends State<DeckContentPage> {
       drawer: MenuDrawer(),
       body: Container(
         child: Center(
-          child: Text('Flash Cards'),
+          child: Text('Deck id: ${widget.id}'),
         ),
       ),
     );

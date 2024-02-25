@@ -31,7 +31,12 @@ class FirestoreManager {
     });
   }
 
-
+  void CreateNewFlashCardDeck(FlashCardDeck newDeck, String uid) async
+  {
+    newDeck.cardCount = 0;
+    var userDoc = await userCollection.where("uid", isEqualTo: uid).get();
+    userCollection.doc(userDoc.docs[0].id).collection("flashcards").add(newDeck.ToMap());
+  }
 
   void CreateFirestoreUser(name, email, id) async
   {

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 class FSUser {
   // "late" allows the variables to be "null" at first and
   // it doesnt require it being initialised
+  late String docId;
   late String id;
   late String name;
   late String email;
@@ -24,6 +25,7 @@ class FSUser {
   //as a User object
   FSUser.fromDoc(DocumentSnapshot document)
   {
+    docId = document.id;
     id = document[FSUser.fieldId];
     name = document[FSUser.fieldName];
     email = document[FSUser.fieldEmail];

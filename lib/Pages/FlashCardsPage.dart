@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+
 import '../Classes/FlashCardDeck.dart';
 import '../UI Elements/MenuDrawer.dart';
-import 'DeckContentPage.dart';
 import '../FirestoreManager.dart';
+
+import 'DeckContentPage.dart';
+import 'CreateNewDeckPage.dart';
 
 class FlashCardsPage extends StatefulWidget {
   @override
@@ -34,19 +37,15 @@ class _FlashCardsPageState extends State<FlashCardsPage> {
             // Display a message if there are no flashcards
             return Center(child: Text('No flashcards available.'));
           } else {
-            // Display the flashcards using ListView.builder
             return ListView.builder(
-              itemCount: snapshot.data!.length,
+              itemCount: snapshot.data!.length + 1,
               itemBuilder: (context, index) {
-                FlashCardDeck deck = snapshot.data![index];
-                return ListTile(
-                  title: Text(deck.name),
-                  subtitle: Text('Number of Cards: NR'),
-                  onTap: () {
-                    // Handle the tap, navigate to a new screen, etc.
-                    // You can use deck.id to pass the selected deck ID
-                  },
-                );
+                if (index < snapshot.data!.length) {
+                  FlashCardDeck deck = snapshot.data![index];
+                  return FlashCardDeckItem(deck: deck);
+                } else {
+                  return CreateNewDeckButton();
+                }
               },
             );
           }
@@ -65,15 +64,32 @@ class _FlashCardsPageState extends State<FlashCardsPage> {
   }
 }
 
+class CreateNewDeckButton extends StatelessWidget{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => CreateNewDeckPage()));
+        },
+        child: Text('Create New Deck'),
+      ),
+    );
+  }
+}
+
 class FlashCardDeckItem extends StatelessWidget {
-  late final FlashCardDeck deck;
+  FlashCardDeck deck;
+
+  FlashCardDeckItem({required this.deck});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text("Card Decks"),
+      title: Text(deck.name),
+      subtitle: Text('Number of Cards: ${deck.cardCount}'),
       onTap: () {
-        // Navigate to a new screen and pass the item's ID
         Navigator.push(
           context,
           MaterialPageRoute(
