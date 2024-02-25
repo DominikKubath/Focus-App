@@ -35,6 +35,12 @@ class _FlashCardsPageState extends State<FlashCardsPage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             // Display a message if there are no flashcards
+            return Column(
+              children: [
+                Container(child: Center(child: Text('No flashcards available.'))),
+                Container(child: CreateNewDeckButton())
+              ],
+            );
             return Center(child: Text('No flashcards available.'));
           } else {
             return ListView.builder(
