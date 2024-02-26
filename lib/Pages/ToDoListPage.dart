@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:studienarbeit_focus_app/Pages/CreateNewToDoItem.dart';
+import 'package:studienarbeit_focus_app/UI%20Elements/ToDoItemWidget.dart';
 import '../UI Elements/MenuDrawer.dart';
+import '../Classes/ToDoItem.dart';
+
+import '../FirestoreManager.dart';
 
 class ToDoListPage extends StatefulWidget {
   @override
@@ -7,35 +12,92 @@ class ToDoListPage extends StatefulWidget {
 }
 
 class _ToDoListPageState extends State<ToDoListPage> {
+  late Future<List<ToDoItem>> todos;
+
   bool isMenuOpen = false;
 
   @override
   Widget build(BuildContext context) {
+    todos = _getToDoItems();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('To Do Liste'),
+        title: Text('All ToDos'),
       ),
       drawer: MenuDrawer(),
-      body: Container(
-        child: Center(
-          child: Text('ToDoListPage'),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Toggle the menu state
-          setState(() {
-            isMenuOpen = !isMenuOpen;
-          });
-
-          // Open or close the drawer based on the state
-          if (isMenuOpen) {
-            Scaffold.of(context).openDrawer();
+      body: FutureBuilder<List<ToDoItem>>(
+        future: todos,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Display a loading indicator while waiting for data
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            // Display an error message if an error occurs
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            // Display a message if there are no todos and the CreateNewToDoButton
+            return Column(
+              children: [
+                Expanded(
+                  child: Center(child: Text('No todos available.')),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 50, left: 70, right: 70, bottom: 10),
+                  child: CreateNewToDoButton(),
+                ),
+              ],
+            );
           } else {
-            Scaffold.of(context).openEndDrawer();
+            // Display the todos using ListView.builder
+            return ListView.builder(
+              itemCount: snapshot.data!.length + 1, // Increase itemCount by 1 to accommodate the button
+              itemBuilder: (context, index) {
+                if (index < snapshot.data!.length) {
+                  // If index is within the range of the data list, display ToDoItemWidget
+                  ToDoItem item = snapshot.data![index];
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 50, left: 70, right: 70, bottom: 10),
+                    child: ToDoItemWidget(
+                      title: item.name,
+                      id: item.id,
+                      description: item.description,
+                      priority: item.priority,
+                    ),
+                  );
+                  // display following padding with child: CreateNewToDoButton() even without ToDoItemWidget
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 50, left: 70, right: 70, bottom: 10),
+                    child: CreateNewToDoButton(),
+                  );
+                }
+              },
+            );
           }
         },
-        child: Icon(Icons.menu),
+      ),
+    );
+  }
+
+  Future<List<ToDoItem>> _getToDoItems() async {
+    String? userId = await FirestoreManager().ReadUid(context);
+    if (userId != null) {
+      return FirestoreManager().GetAllToDos(userId);
+    } else {
+      return [];
+    }
+  }
+}
+
+class CreateNewToDoButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => CreateNewToDoPage()));
+      },
+      child: Text('Create new ToDo'),
       ),
     );
   }

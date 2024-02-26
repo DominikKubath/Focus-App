@@ -9,6 +9,7 @@ import 'Pages/BasePage.dart';
 import 'Pages/AuthenticationPage.dart';
 import 'Classes/UserInfo.dart';
 import 'LoadingScreen.dart';
+import 'constants/ColorPalette.dart';
 
 
 void main() async{
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // theme: ThemeData(scaffoldBackgroundColor: Color(secColor.value)),
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
