@@ -11,17 +11,21 @@ import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:studienarbeit_focus_app/Classes/UserInfo.dart';
 
+import 'Classes/FlashCard.dart';
 import 'Classes/FlashCardDeck.dart';
 
 class FirestoreManager {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   CollectionReference userCollection = _firestore.collection("user");
 
+  static const String flashCardDecksCollectionName = "flashcards";
+  static const String flashCardContentCollectionName = "content";
+
 
   Future<List<FlashCardDeck>> GetAllFlashCardDecks(String uid) async
   {
     var userDocument = await userCollection.where("uid", isEqualTo: uid).get();
-    return await userCollection.doc(userDocument.docs[0].id).collection("flashcards").get().then((value){
+    return await userCollection.doc(userDocument.docs[0].id).collection(flashCardDecksCollectionName).get().then((value){
       List<FlashCardDeck> decks = [];
       value.docs.forEach((element) {
         debugPrint("GOT DECK " + element.data().toString());
@@ -31,11 +35,41 @@ class FirestoreManager {
     });
   }
 
+  void AddNewFlashCard(FlashCard card, String deckId, String uid) async
+  {
+    card.lastStudied = Timestamp.now();
+    card.lastStatus = LastStatus.New;
+    var user = await GetCurrentUser(uid);
+    userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).collection(flashCardContentCollectionName).add(card.ToMap());
+    UpdateDeckCardCount(deckId, uid);
+  }
+
+  void UpdateDeckCardCount(String deckId, String uid) async
+  {
+    var user = await GetCurrentUser(uid);
+    var querySnapshot = await userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).collection(flashCardContentCollectionName).get();
+    var cardCount = querySnapshot.docs.length;
+    userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).update({FlashCardDeck.fieldCardCount : cardCount});
+  }
+
+  void RenameFlashCardDeck(String newName, FlashCardDeck deck, String uid) async
+  {
+    var user = await GetCurrentUser(uid);
+    deck.name = newName;
+    userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deck.id).update(deck.ToMap());
+  }
+
+  void DeleteFlashCardDeck(String deckId, String uid) async
+  {
+    var user = await GetCurrentUser(uid);
+    userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).delete();
+  }
+
   void CreateNewFlashCardDeck(FlashCardDeck newDeck, String uid) async
   {
     newDeck.cardCount = 0;
     var userDoc = await userCollection.where("uid", isEqualTo: uid).get();
-    userCollection.doc(userDoc.docs[0].id).collection("flashcards").add(newDeck.ToMap());
+    userCollection.doc(userDoc.docs[0].id).collection(flashCardDecksCollectionName).add(newDeck.ToMap());
   }
 
   void CreateFirestoreUser(name, email, id) async
@@ -51,6 +85,13 @@ class FirestoreManager {
       return FSUser.fromDoc(value.docs[0]);
     });
   }
+
+  Future<DocumentSnapshot> GetCurrentUser(String uid) async
+  {
+    var userSnapshot = await userCollection.where("uid", isEqualTo: uid).get();
+    return userSnapshot.docs[0];
+  }
+
 
   void SaveUserId(UserCredential userCredentials, BuildContext context) async
   {

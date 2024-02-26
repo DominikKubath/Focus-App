@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:studienarbeit_focus_app/Pages/AddFlashCardPage.dart';
 
 import '../Classes/FlashCardDeck.dart';
 import '../UI Elements/MenuDrawer.dart';
@@ -6,6 +7,7 @@ import '../FirestoreManager.dart';
 
 import 'DeckContentPage.dart';
 import 'CreateNewDeckPage.dart';
+import 'EditDeckPage.dart';
 
 class FlashCardsPage extends StatefulWidget {
   @override
@@ -86,7 +88,7 @@ class CreateNewDeckButton extends StatelessWidget{
 }
 
 class FlashCardDeckItem extends StatelessWidget {
-  FlashCardDeck deck;
+  final FlashCardDeck deck;
 
   FlashCardDeckItem({required this.deck});
 
@@ -95,6 +97,57 @@ class FlashCardDeckItem extends StatelessWidget {
     return ListTile(
       title: Text(deck.name),
       subtitle: Text('Number of Cards: ${deck.cardCount}'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Tooltip(
+              message: 'Add New Flashcard',
+              child: Icon(Icons.add),
+            ),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AddFlashCardPage(deckId: deck.id)
+                  )
+              );
+            },
+          ),
+          IconButton(
+            icon: Tooltip(
+              message: 'Edit',
+              child: Icon(Icons.edit),
+            ),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                  builder: (context) => EditDeckPage(deckId: deck.id)
+                  )
+              );
+            },
+          ),
+          IconButton(
+            icon: Tooltip(
+              message: 'Rename',
+              child: Icon(Icons.label),
+            ),
+            onPressed: () {
+              _showRenameDialog(context, deck);
+            },
+          ),
+          IconButton(
+            icon: Tooltip(
+              message: 'Delete',
+              child: Icon(Icons.delete),
+            ),
+            onPressed: () {
+              _showDeleteConfirmation(context, deck);
+            },
+          ),
+        ],
+      ),
       onTap: () {
         Navigator.push(
           context,
@@ -105,4 +158,75 @@ class FlashCardDeckItem extends StatelessWidget {
       },
     );
   }
+  void _showDeleteConfirmation(BuildContext context, FlashCardDeck deck) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Deck'),
+          content: Text('Are you sure you want to delete ${deck.name}?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                var uid = await FirestoreManager().ReadUid(context);
+                FirestoreManager().DeleteFlashCardDeck(deck.id, uid!);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FlashCardsPage(),
+                    ),
+                        (Route<dynamic> route) => false); // Close the dialog
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showRenameDialog(BuildContext context, FlashCardDeck deck) {
+    TextEditingController newDeckNameController = TextEditingController(text: deck.name);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Rename Deck'),
+          content: TextField(
+            controller: newDeckNameController,
+            decoration: InputDecoration(labelText: 'New Deck Name'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                var uid = await FirestoreManager().ReadUid(context);
+                FirestoreManager().RenameFlashCardDeck(newDeckNameController.text, deck, uid!);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FlashCardsPage(),
+                    ),
+                        (Route<dynamic> route) => false); // Close the dialog
+              },
+              child: Text('Rename'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
+
