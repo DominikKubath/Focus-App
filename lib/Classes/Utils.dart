@@ -1,5 +1,21 @@
 import 'package:flutter/material.dart';
+import '../Constants/ColorPalette.dart';
+
 class Utils {
+  static Color getPriorityColor(int priority) {
+    switch (priority) {
+      case 3:
+        return ColorPalette.Red; // High priority
+      case 2:
+        return ColorPalette.Orange; // Medium priority
+      case 1:
+        return ColorPalette.Yellow; // Low priority
+      default:
+        return ColorPalette.Grey; // No priority
+    }
+  }
+
+
   Color getColorFromHex(String hexColor) {
     //Taken from https://stackoverflow.com/questions/50081213/how-do-i-use-hexadecimal-color-strings-in-flutter
     hexColor = hexColor.toUpperCase().replaceAll("#", "");
