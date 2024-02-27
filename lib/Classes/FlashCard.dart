@@ -30,8 +30,20 @@ class FlashCard
     docId = doc.id;
     frontside = doc[FlashCard.fieldFrontside];
     backside = doc[FlashCard.fieldBackside];
-    lastStatus = doc[FlashCard.fieldLastStatus];
+    lastStatus = LastStatus.values.firstWhere(
+          (status) => status.toString() == 'LastStatus.${doc[FlashCard.fieldLastStatus]}',
+      orElse: () => LastStatus.New,
+    );
     lastStudied = doc[FlashCard.fieldLastStudied];
+  }
+  FlashCard.fromMap(Map<String, dynamic> doc) {
+    docId = doc['id'];
+    frontside = doc[fieldFrontside];
+    backside = doc[fieldBackside];
+    lastStatus = LastStatus.values.firstWhere(
+            (status) => status.toString() == doc[fieldLastStatus],
+        orElse: () => LastStatus.New);
+    lastStudied = doc[fieldLastStudied];
   }
 
   Map<String, dynamic> ToMap()

@@ -69,6 +69,24 @@ class FirestoreManager {
     });
   }
 
+  Future<List<FlashCard>> GetAllFlashCardsOfDeck(String deckId, String uid) async
+  {
+    var user = await GetCurrentUser(uid);
+    return await userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).collection(flashCardContentCollectionName).get().then((value){
+      List<FlashCard> cards = [];
+      value.docs.forEach((card) {
+        cards.add(FlashCard.fromDoc(card));
+      });
+      return cards;
+    });
+  }
+
+  void UpdateFlashCardField(String cardId, String fieldName, String newContent, String deckId, String userId) async
+  {
+    var user = await GetCurrentUser(userId);
+    userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).collection(flashCardContentCollectionName).doc(cardId).update({fieldName : newContent});
+  }
+
   void AddNewFlashCard(FlashCard card, String deckId, String uid) async
   {
     card.lastStudied = Timestamp.now();

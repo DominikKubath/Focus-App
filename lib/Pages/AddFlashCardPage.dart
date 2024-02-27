@@ -35,9 +35,10 @@ class _AddFlashCardPageState extends State<AddFlashCardPage> {
                 controller: frontsideController,
                 decoration: InputDecoration(
                   labelText: 'Frontside',
-                  contentPadding: EdgeInsets.all(20),
+                  border: OutlineInputBorder(),
                 ),
                 style: TextStyle(fontSize: 20),
+                minLines: 4,
                 maxLines: null,
               ),
             ),
@@ -48,9 +49,10 @@ class _AddFlashCardPageState extends State<AddFlashCardPage> {
                 controller: backsideController,
                 decoration: InputDecoration(
                   labelText: 'Backside',
-                  contentPadding: EdgeInsets.all(20),
+                  border: OutlineInputBorder(),
                 ),
                 style: TextStyle(fontSize: 20),
+                minLines: 4,
                 maxLines: null,
               ),
             ),
