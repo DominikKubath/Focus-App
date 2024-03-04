@@ -64,12 +64,12 @@ class _AddFlashCardPageState extends State<AddFlashCardPage> {
                 card.frontside = frontsideController.text;
                 card.backside = backsideController.text;
                 FirestoreManager().AddNewFlashCard(card, widget.deckId, uid!);
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => FlashCardsPage(),
-                    ),
-                        (Route<dynamic> route) => false);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FlashCardsPage(),
+                  ),
+                );
               },
               child: Text('Add FlashCard'),
             ),

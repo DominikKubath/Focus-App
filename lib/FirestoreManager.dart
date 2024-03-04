@@ -117,11 +117,16 @@ class FirestoreManager {
     userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).delete();
   }
 
-  void CreateNewFlashCardDeck(FlashCardDeck newDeck, String uid) async
-  {
+  Future<List<FlashCardDeck>> CreateNewFlashCardDeck(FlashCardDeck newDeck, String uid) async {
     newDeck.cardCount = 0;
-    var userDoc = await userCollection.where("uid", isEqualTo: uid).get();
-    userCollection.doc(userDoc.docs[0].id).collection(flashCardDecksCollectionName).add(newDeck.ToMap());
+
+    var userDoc = await GetCurrentUser(uid);
+    var newDeckRef = await userCollection.doc(userDoc.id).collection(flashCardDecksCollectionName).add(newDeck.ToMap());
+
+    // Fetch the updated list of decks
+    var updatedDecks = await GetAllFlashCardDecks(uid);
+
+    return updatedDecks;
   }
 
   void CreateFirestoreUser(name, email, id) async

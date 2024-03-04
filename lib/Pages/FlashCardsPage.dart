@@ -8,6 +8,7 @@ import '../FirestoreManager.dart';
 import 'DeckContentPage.dart';
 import 'CreateNewDeckPage.dart';
 import 'EditDeckPage.dart';
+import 'FlashCardStudyPage.dart';
 
 class FlashCardsPage extends StatefulWidget {
   @override
@@ -65,7 +66,11 @@ class _FlashCardsPageState extends State<FlashCardsPage> {
   Future<List<FlashCardDeck>> _getFlashCardDecks() async {
     String? userId = await FirestoreManager().ReadUid(context);
     if (userId != null) {
-      return FirestoreManager().GetAllFlashCardDecks(userId);
+      var decks = await FirestoreManager().GetAllFlashCardDecks(userId);
+      decks.forEach((deck) async {
+        deck.flashCards = await FirestoreManager().GetAllFlashCardsOfDeck(deck.id, userId);
+      });
+      return decks;
     } else {
       return [];
     }
@@ -79,13 +84,65 @@ class CreateNewDeckButton extends StatelessWidget{
       padding: EdgeInsets.all(16.0),
       child: ElevatedButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => CreateNewDeckPage()));
+          _showCreateDeckDialog(context);
         },
         child: Text('Create New Deck'),
       ),
     );
   }
+
+  void _showCreateDeckDialog(BuildContext context) async {
+    TextEditingController newDeckNameController = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Enter the name of the flashcard deck"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Deck Name"),
+              TextFormField(
+                controller: newDeckNameController,
+                decoration: InputDecoration(
+                  hintText: "Example: Vocab Spanish",
+                  hintStyle: TextStyle(color: Colors.grey),
+                ),
+                keyboardType: TextInputType.text,
+              ),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  String? uid = await FirestoreManager().ReadUid(context);
+                  FlashCardDeck deck = FlashCardDeck.empty();
+                  deck.name = newDeckNameController.text;
+
+                  // Create new deck and get the updated list
+                  List<FlashCardDeck> updatedDecks = await FirestoreManager().CreateNewFlashCardDeck(deck, uid!);
+
+                  Navigator.pop(context); // Close the dialog
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FlashCardsPage(),
+                    ),
+                  );
+                } catch (e) {
+                  // Handle error
+                }
+              },
+              child: Text('Create Deck'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
+
 
 class FlashCardDeckItem extends StatelessWidget {
   final FlashCardDeck deck;
@@ -123,7 +180,7 @@ class FlashCardDeckItem extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                  builder: (context) => EditDeckPage(deckId: deck.id)
+                  builder: (context) => EditDeckPage(deckId: deck.id, flashCards: deck.flashCards)
                   )
               );
             },
@@ -149,10 +206,16 @@ class FlashCardDeckItem extends StatelessWidget {
         ],
       ),
       onTap: () {
-        Navigator.push(
+        /*Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => DeckContentPage(id: deck.id),
+          ),
+        );*/
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FlashCardStudyPage(flashCards: deck.flashCards),
           ),
         );
       },
