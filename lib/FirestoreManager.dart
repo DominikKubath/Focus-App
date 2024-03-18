@@ -11,9 +11,11 @@ import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:studienarbeit_focus_app/Classes/UserInfo.dart';
 
+import 'Classes/Attempt.dart';
 import 'Classes/FlashCard.dart';
 import 'Classes/FlashCardDeck.dart';
 import 'Classes/ToDoItem.dart';
+import 'Classes/Utils.dart';
 
 class FirestoreManager {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -21,6 +23,7 @@ class FirestoreManager {
 
   static const String flashCardDecksCollectionName = "flashcards";
   static const String flashCardContentCollectionName = "content";
+  static const String flashCardAttemptCollectionName = "attempts";
 
   Future<List<ToDoItem>> GetAllToDos(String uid) async
   {
@@ -69,22 +72,60 @@ class FirestoreManager {
     });
   }
 
-  Future<List<FlashCard>> GetAllFlashCardsOfDeck(String deckId, String uid) async
-  {
+  Future<List<FlashCard>> GetAllFlashCardsOfDeck(String deckId, String uid) async {
     var user = await GetCurrentUser(uid);
-    return await userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).collection(flashCardContentCollectionName).get().then((value){
-      List<FlashCard> cards = [];
-      value.docs.forEach((card) {
-        cards.add(FlashCard.fromDoc(card));
-      });
-      return cards;
-    });
+    var cardsSnapshot = await userCollection
+        .doc(user.id)
+        .collection(flashCardDecksCollectionName)
+        .doc(deckId)
+        .collection(flashCardContentCollectionName)
+        .get();
+
+    List<FlashCard> cards = [];
+    for (var card in cardsSnapshot.docs) {
+      var retrievedCard = FlashCard.fromDoc(card);
+      retrievedCard.attempts = await GetAllAttemptsOfFlashCard(deckId, retrievedCard.docId, uid);
+      cards.add(retrievedCard);
+    }
+
+    var sortedCards = Utils().DefaultSortFlashCards(cards);
+    return sortedCards;
   }
 
   void UpdateFlashCardField(String cardId, String fieldName, String newContent, String deckId, String userId) async
   {
     var user = await GetCurrentUser(userId);
     userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).collection(flashCardContentCollectionName).doc(cardId).update({fieldName : newContent});
+  }
+
+  void UpdateFlashCardStatusAndLastStudied(FlashCard card, String deckId, String userId) async
+  {
+    var user = await GetCurrentUser(userId);
+    Map<String, dynamic> updatedDoc = {
+      FlashCard.fieldLastStudied : card.lastStudied,
+      FlashCard.fieldLastStatus : card.lastStatus.name.toString()
+    };
+    userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).collection(flashCardContentCollectionName).doc(card.docId).update(updatedDoc);
+  }
+
+  void AddFlashCardAttempt(Attempt attempt, String deckId, String flashCardId, String uid) async
+  {
+    var user = await GetCurrentUser(uid);
+    userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId)
+        .collection(flashCardContentCollectionName).doc(flashCardId).collection(flashCardAttemptCollectionName).add(attempt.ToMap());
+  }
+
+  Future<List<Attempt>> GetAllAttemptsOfFlashCard(String deckId, String flashCardDocId, String uid) async
+  {
+    var user = await GetCurrentUser(uid);
+    return await userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).collection(flashCardContentCollectionName).doc(flashCardDocId).collection(flashCardAttemptCollectionName).get()
+        .then((value) {
+      List<Attempt> attempts = [];
+      value.docs.forEach((attempt) {
+        attempts.add(Attempt.fromDoc(attempt));
+      });
+      return attempts;
+    });
   }
 
   void AddNewFlashCard(FlashCard card, String deckId, String uid) async

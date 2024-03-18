@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Constants/ColorPalette.dart';
+import 'FlashCard.dart';
 
 class Utils {
   static Color getPriorityColor(int priority) {
@@ -57,4 +58,55 @@ class Utils {
     );
     return regExp.hasMatch(email);
   }
+
+  //This method Sorts FlashCards - It takes into account if they were easy for you and
+  // when the last time was since you have studied them
+  List<FlashCard> DefaultSortFlashCards(List<FlashCard> flashCards)
+  {
+    print("Input FlashCards: " + flashCards.toString());
+
+    List<FlashCard> cardsToRepeat = flashCards
+        .where((card) =>
+    card.lastStatus == LastStatus.Repeat &&
+        DateTime.now().difference(card.lastStudied.toDate()).inHours > 24)
+        .toList();
+    print("Following Cards to Repeat: " + cardsToRepeat.toString());
+
+    List<FlashCard> hardCards = flashCards
+        .where((card) => card.lastStatus == LastStatus.Hard && DateTime.now().difference(card.lastStudied.toDate()).inHours > 0.5)
+        .toList();
+    print("Following Hard Cards: " + hardCards.toString());
+
+    List<FlashCard> goodCards = flashCards
+        .where((card) => card.lastStatus == LastStatus.Good && DateTime.now().difference(card.lastStudied.toDate()).inHours > 2)
+        .toList();
+    print("Following Good Cards: " + goodCards.toString());
+
+    List<FlashCard> easyCards = flashCards
+        .where((card) => card.lastStatus == LastStatus.Easy && DateTime.now().difference(card.lastStudied.toDate()).inHours > 12)
+        .toList();
+    print("Following Easy Cards: " + easyCards.toString());
+
+    List<FlashCard> newCards = flashCards
+        .where((card) => card.lastStatus == LastStatus.New && DateTime.now().difference(card.lastStudied.toDate()).inHours > 0)
+        .toList();
+    print("Following New Cards: " + newCards.toString());
+
+    List<FlashCard> sortedFlashCards = [
+      ...cardsToRepeat,
+      ...hardCards,
+      ...goodCards,
+      ...easyCards,
+      ...newCards,
+    ];
+    print("Following Sorted Flashcards: " + sortedFlashCards.toString());
+
+    if(sortedFlashCards.isEmpty)
+    {
+      sortedFlashCards = flashCards;
+    }
+
+    return sortedFlashCards;
+  }
+
 }

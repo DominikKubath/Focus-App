@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:studienarbeit_focus_app/Pages/AddFlashCardPage.dart';
 
 import '../Classes/FlashCardDeck.dart';
+import '../Classes/Utils.dart';
 import '../UI Elements/MenuDrawer.dart';
 import '../FirestoreManager.dart';
 
@@ -69,6 +70,7 @@ class _FlashCardsPageState extends State<FlashCardsPage> {
       var decks = await FirestoreManager().GetAllFlashCardDecks(userId);
       decks.forEach((deck) async {
         deck.flashCards = await FirestoreManager().GetAllFlashCardsOfDeck(deck.id, userId);
+        print("Fetched FlashCards for ${deck.name}: ${deck.flashCards?[0].docId}");
       });
       return decks;
     } else {
@@ -187,6 +189,20 @@ class FlashCardDeckItem extends StatelessWidget {
           ),
           IconButton(
             icon: Tooltip(
+              message: 'Statistics',
+              child: Icon(Icons.bar_chart),
+            ),
+            onPressed: () {
+              /*Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => EditDeckPage(deckId: deck.id, flashCards: deck.flashCards)
+                  )
+              );*/
+            },
+          ),
+          IconButton(
+            icon: Tooltip(
               message: 'Rename',
               child: Icon(Icons.label),
             ),
@@ -206,16 +222,10 @@ class FlashCardDeckItem extends StatelessWidget {
         ],
       ),
       onTap: () {
-        /*Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DeckContentPage(id: deck.id),
-          ),
-        );*/
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => FlashCardStudyPage(flashCards: deck.flashCards),
+            builder: (context) => FlashCardStudyPage(flashCards: deck.flashCards, deckId: deck.id),
           ),
         );
       },

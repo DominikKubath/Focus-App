@@ -1,12 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:studienarbeit_focus_app/FirestoreManager.dart';
 
+import '../Classes/Attempt.dart';
 import '../Classes/FlashCard.dart';
 
 class FlashCardStudyPage extends StatefulWidget {
   final List<FlashCard> flashCards;
+  final String deckId;
 
-  const FlashCardStudyPage({Key? key, required this.flashCards}) : super(key: key);
+  const FlashCardStudyPage({Key? key, required this.flashCards, required this.deckId}) : super(key: key);
 
   @override
   _FlashCardStudyPageState createState() => _FlashCardStudyPageState();
@@ -15,9 +19,14 @@ class FlashCardStudyPage extends StatefulWidget {
 class _FlashCardStudyPageState extends State<FlashCardStudyPage> {
   PageController _pageController = PageController();
   bool showBackside = false;
+  late FlashCard currentCard;
+  late Timestamp startOfAttempt;
+  late Timestamp endOfAttempt;
+  late int globalIndex;
 
   @override
   Widget build(BuildContext context) {
+    startOfAttempt = Timestamp.now();
     return RawKeyboardListener(
       focusNode: FocusNode(),
       autofocus: true,
@@ -49,13 +58,16 @@ class _FlashCardStudyPageState extends State<FlashCardStudyPage> {
           itemCount: widget.flashCards.length + 1, // Add 1 for the "No more cards" page
           itemBuilder: (context, index) {
             if (index < widget.flashCards.length) {
-              FlashCard currentFlashcard = widget.flashCards[index];
+              //FlashCard currentFlashcard = widget.flashCards[index];
+              globalIndex = index;
+              currentCard = widget.flashCards[index];
+              //startOfAttempt = Timestamp.now();
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      showBackside ? currentFlashcard.backside : currentFlashcard.frontside,
+                      showBackside ? currentCard.backside : currentCard.frontside,
                       style: TextStyle(fontSize: 24),
                     ),
                     SizedBox(height: 20),
@@ -64,6 +76,7 @@ class _FlashCardStudyPageState extends State<FlashCardStudyPage> {
                         onPressed: () {
                           setState(() {
                             showBackside = !showBackside;
+                            //endOfAttempt = Timestamp.now();
                           });
                         },
                         child: Column(
@@ -89,7 +102,6 @@ class _FlashCardStudyPageState extends State<FlashCardStudyPage> {
                 ),
               );
             } else {
-              // Display a message for no more cards
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -116,8 +128,26 @@ class _FlashCardStudyPageState extends State<FlashCardStudyPage> {
     );
   }
 
-  void _handleResponse(String response) {
+  void _handleResponse(String response) async {
+    String? userId = await FirestoreManager().ReadUid(context);
     print('User responded with: $response');
+
+    Attempt newAttempt = Attempt.empty();
+    newAttempt.attemptStart = startOfAttempt;
+    newAttempt.attemptEnd = Timestamp.now();
+    newAttempt.status = LastStatus.values.firstWhere(
+            (status) => status.name.toString() == response,
+        orElse: () => LastStatus.New);
+    currentCard.lastStatus = newAttempt.status;
+    currentCard.lastStudied = Timestamp.now();
+
+    if(response == 'Repeat')
+      {
+        widget.flashCards.add(widget.flashCards[globalIndex]);
+      }
+
+    FirestoreManager().UpdateFlashCardStatusAndLastStudied(currentCard, widget.deckId, userId!);
+    FirestoreManager().AddFlashCardAttempt(newAttempt, widget.deckId, currentCard.docId, userId);
     _pageController.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
   }
 }

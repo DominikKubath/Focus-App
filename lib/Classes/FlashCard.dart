@@ -2,12 +2,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
+import 'Attempt.dart';
+
 enum LastStatus{
   Repeat,
   Hard,
   Good,
   Easy,
   New
+}
+
+enum StudyType{
+  Text,
+  Image,
+  FillGaps,
 }
 
 class FlashCard
@@ -17,6 +25,8 @@ class FlashCard
   late String backside;
   late LastStatus lastStatus;
   late Timestamp lastStudied;
+  late StudyType studyType;
+  late List<Attempt> attempts;
 
   static const String fieldFrontside = "frontside";
   static const String fieldBackside = "backside";
@@ -41,7 +51,7 @@ class FlashCard
     frontside = doc[fieldFrontside];
     backside = doc[fieldBackside];
     lastStatus = LastStatus.values.firstWhere(
-            (status) => status.toString() == doc[fieldLastStatus],
+            (status) => status.name.toString() == doc[fieldLastStatus],
         orElse: () => LastStatus.New);
     lastStudied = doc[fieldLastStudied];
   }
