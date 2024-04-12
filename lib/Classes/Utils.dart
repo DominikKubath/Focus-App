@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../Constants/ColorPalette.dart';
 import 'FlashCard.dart';
@@ -98,6 +99,83 @@ class Utils {
       ...goodCards,
       ...easyCards,
       ...newCards,
+    ];
+    print("Following Sorted Flashcards: " + sortedFlashCards.toString());
+
+    if(sortedFlashCards.isEmpty)
+    {
+      sortedFlashCards = flashCards;
+    }
+
+    return sortedFlashCards;
+  }
+  
+  List<FlashCard> CardSortOptionNew(List<FlashCard> flashCards)
+  {
+      List<FlashCard> newCards = flashCards
+          .where((card) => card.lastStatus == LastStatus.New && DateTime.now().difference(card.lastStudied.toDate()).inHours > 0)
+          .toList();
+      print("Following New Cards: " + newCards.toString());
+
+      List<FlashCard> cardsToRepeat = flashCards
+          .where((card) =>
+      card.lastStatus == LastStatus.Repeat &&
+          DateTime.now().difference(card.lastStudied.toDate()).inHours > 24)
+          .toList();
+      print("Following Cards to Repeat: " + cardsToRepeat.toString());
+
+      List<FlashCard> hardCards = flashCards
+          .where((card) => card.lastStatus == LastStatus.Hard && DateTime.now().difference(card.lastStudied.toDate()).inHours > 0.5)
+          .toList();
+      print("Following Hard Cards: " + hardCards.toString());
+
+      List<FlashCard> goodCards = flashCards
+          .where((card) => card.lastStatus == LastStatus.Good && DateTime.now().difference(card.lastStudied.toDate()).inHours > 2)
+          .toList();
+      print("Following Good Cards: " + goodCards.toString());
+
+      List<FlashCard> easyCards = flashCards
+          .where((card) => card.lastStatus == LastStatus.Easy && DateTime.now().difference(card.lastStudied.toDate()).inHours > 12)
+          .toList();
+      print("Following Easy Cards: " + easyCards.toString());
+
+
+      List<FlashCard> sortedFlashCards = [
+        ...newCards,
+        ...cardsToRepeat,
+        ...hardCards,
+        ...goodCards,
+        ...easyCards,
+      ];
+      
+      return sortedFlashCards;
+  }
+  
+  List<FlashCard> CardSortOptionOldest(List<FlashCard> flashCards)
+  {
+    flashCards.sort((a, b) => a.lastStudied.compareTo(b.lastStudied));
+    return flashCards;
+  }
+
+  List<FlashCard> CardSortOptionHardest(List<FlashCard> flashCards)
+  {
+    List<FlashCard> cardsToRepeat = flashCards
+        .where((card) =>
+    card.lastStatus == LastStatus.Repeat).toList();
+    print("Following Cards to Repeat: " + cardsToRepeat.toString());
+
+    List<FlashCard> hardCards = flashCards
+        .where((card) => card.lastStatus == LastStatus.Hard).toList();
+    print("Following Hard Cards: " + hardCards.toString());
+
+    List<FlashCard> goodCards = flashCards
+        .where((card) => card.lastStatus == LastStatus.Good).toList();
+    print("Following Good Cards: " + goodCards.toString());
+
+    List<FlashCard> sortedFlashCards = [
+      ...cardsToRepeat,
+      ...hardCards,
+      ...goodCards,
     ];
     print("Following Sorted Flashcards: " + sortedFlashCards.toString());
 

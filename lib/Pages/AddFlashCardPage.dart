@@ -9,7 +9,6 @@ class AddFlashCardPage extends StatefulWidget {
 
   const AddFlashCardPage({Key? key, required this.deckId}) : super(key: key);
 
-
   @override
   _AddFlashCardPageState createState() => _AddFlashCardPageState();
 }
@@ -30,7 +29,7 @@ class _AddFlashCardPageState extends State<AddFlashCardPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 200.0), // Set max height
+              constraints: BoxConstraints(maxHeight: 200.0),
               child: TextField(
                 controller: frontsideController,
                 decoration: InputDecoration(
@@ -44,7 +43,7 @@ class _AddFlashCardPageState extends State<AddFlashCardPage> {
             ),
             SizedBox(height: 24),
             ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 200.0), // Set max height
+              constraints: BoxConstraints(maxHeight: 200.0),
               child: TextField(
                 controller: backsideController,
                 decoration: InputDecoration(
@@ -63,13 +62,32 @@ class _AddFlashCardPageState extends State<AddFlashCardPage> {
                 FlashCard card = FlashCard.empty();
                 card.frontside = frontsideController.text;
                 card.backside = backsideController.text;
-                FirestoreManager().AddNewFlashCard(card, widget.deckId, uid!);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FlashCardsPage(),
-                  ),
-                );
+
+                // Call AddNewFlashCard method
+                var result = await FirestoreManager().AddNewFlashCard(card, widget.deckId, uid!);
+
+                // Check if the result is successful
+                if (result != null) {
+                  // Show SnackBar with the message "New Card Added!"
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('New Card Added!'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+
+                  // Clear the text fields after adding the card
+                  frontsideController.clear();
+                  backsideController.clear();
+                } else {
+                  // Show error message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Something went wrong!'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
               },
               child: Text('Add FlashCard'),
             ),
@@ -78,5 +96,4 @@ class _AddFlashCardPageState extends State<AddFlashCardPage> {
       ),
     );
   }
-
 }

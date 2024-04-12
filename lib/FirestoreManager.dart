@@ -72,7 +72,7 @@ class FirestoreManager {
     });
   }
 
-  Future<List<FlashCard>> GetAllFlashCardsOfDeck(String deckId, String uid) async {
+  Future<List<FlashCard>> GetAllFlashCardsOfDeck(String deckId, String uid, String filter) async {
     var user = await GetCurrentUser(uid);
     var cardsSnapshot = await userCollection
         .doc(user.id)
@@ -88,8 +88,24 @@ class FirestoreManager {
       cards.add(retrievedCard);
     }
 
-    var sortedCards = Utils().DefaultSortFlashCards(cards);
-    return sortedCards;
+    filter = filter.toUpperCase();
+    var sortedCards;
+    switch(filter)
+    {
+      case "DEFAULT":
+        sortedCards = Utils().DefaultSortFlashCards(cards);
+        break;
+      case "OLDEST":
+        sortedCards = Utils().CardSortOptionOldest(cards);
+        break;
+      case "NEW":
+        sortedCards = Utils().CardSortOptionNew(cards);
+        break;
+      case "HARDEST":
+        sortedCards = Utils().CardSortOptionHardest(cards);
+        break;
+    }
+    return sortedCards ?? [];
   }
 
   void UpdateFlashCardField(String cardId, String fieldName, String newContent, String deckId, String userId) async
@@ -128,14 +144,28 @@ class FirestoreManager {
     });
   }
 
-  void AddNewFlashCard(FlashCard card, String deckId, String uid) async
+  Future<List<Attempt>> GetAllAttemptsOfDeck(String deckId, String uid) async
+  {
+    /*var user = await GetCurrentUser(uid);
+    var deckRef = userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId);
+
+    var flashcardsQuerySnapshot = await deckRef.collection(flashCardContentCollectionName).get();
+    for (var docSnapshot in flashcardsQuerySnapshot.docs) {
+      await docSnapshot.reference.delete();
+    }*/
+    return [];
+  }
+
+  Future<DocumentReference<Map<String, dynamic>>> AddNewFlashCard(FlashCard card, String deckId, String uid) async
   {
     card.lastStudied = Timestamp.now();
     card.lastStatus = LastStatus.New;
     var user = await GetCurrentUser(uid);
-    userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).collection(flashCardContentCollectionName).add(card.ToMap());
+    var result = await userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).collection(flashCardContentCollectionName).add(card.ToMap());
     UpdateDeckCardCount(deckId, uid);
+    return result;
   }
+
 
   void UpdateDeckCardCount(String deckId, String uid) async
   {
@@ -143,6 +173,13 @@ class FirestoreManager {
     var querySnapshot = await userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).collection(flashCardContentCollectionName).get();
     var cardCount = querySnapshot.docs.length;
     userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).update({FlashCardDeck.fieldCardCount : cardCount});
+  }
+
+  void UpdateFilterMode(String newFilter, FlashCardDeck deck, String uid) async
+  {
+    var user = await GetCurrentUser(uid);
+    deck.filterMode = newFilter;
+    userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deck.id).update(deck.ToMap());
   }
 
   void RenameFlashCardDeck(String newName, FlashCardDeck deck, String uid) async
@@ -155,11 +192,18 @@ class FirestoreManager {
   void DeleteFlashCardDeck(String deckId, String uid) async
   {
     var user = await GetCurrentUser(uid);
-    userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId).delete();
+    var deckRef = userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId);
+
+    var flashcardsQuerySnapshot = await deckRef.collection(flashCardContentCollectionName).get();
+    for (var docSnapshot in flashcardsQuerySnapshot.docs) {
+      await docSnapshot.reference.delete();
+    }
+    deckRef.delete();
   }
 
   Future<List<FlashCardDeck>> CreateNewFlashCardDeck(FlashCardDeck newDeck, String uid) async {
     newDeck.cardCount = 0;
+    newDeck.filterMode = "Default";
 
     var userDoc = await GetCurrentUser(uid);
     var newDeckRef = await userCollection.doc(userDoc.id).collection(flashCardDecksCollectionName).add(newDeck.ToMap());
@@ -228,7 +272,7 @@ class FirestoreManager {
     {
       // Android platform: Use shared_preferences to read user ID
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      return prefs.getString('user_id');
+      return prefs.getString('uid');
     } else if (Theme.of(context).platform == TargetPlatform.iOS) {
       // iOS platform: Handle accordingly
       // You may use a different storage solution for iOS if needed.

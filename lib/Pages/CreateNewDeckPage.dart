@@ -47,12 +47,7 @@ class _CreateNewDeckPageState extends State<CreateNewDeckPage> {
                       FlashCardDeck deck = FlashCardDeck.empty();
                       deck.name = newDeckNameController.text;
                       FirestoreManager().CreateNewFlashCardDeck(deck, uid!);
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FlashCardsPage(),
-                          ),
-                              (Route<dynamic> route) => false);
+                      Navigator.popUntil(context, ModalRoute.withName('/'));
                     } catch (e) {
 
                     }

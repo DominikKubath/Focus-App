@@ -58,17 +58,24 @@ class _FlashCardStudyPageState extends State<FlashCardStudyPage> {
           itemCount: widget.flashCards.length + 1, // Add 1 for the "No more cards" page
           itemBuilder: (context, index) {
             if (index < widget.flashCards.length) {
-              //FlashCard currentFlashcard = widget.flashCards[index];
               globalIndex = index;
               currentCard = widget.flashCards[index];
-              //startOfAttempt = Timestamp.now();
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      showBackside ? currentCard.backside : currentCard.frontside,
-                      style: TextStyle(fontSize: 24),
+                    SizedBox(
+                      height: 400, // Set a fixed height for the container
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical, // Set the scroll direction to vertical
+                        child: Container(
+                          padding: EdgeInsets.all(16.0), // Add padding to the container
+                          child: Text(
+                            showBackside ? currentCard.backside : currentCard.frontside,
+                            style: TextStyle(fontSize: 24),
+                          ),
+                        ),
+                      ),
                     ),
                     SizedBox(height: 20),
                     if (!showBackside)
@@ -76,7 +83,6 @@ class _FlashCardStudyPageState extends State<FlashCardStudyPage> {
                         onPressed: () {
                           setState(() {
                             showBackside = !showBackside;
-                            //endOfAttempt = Timestamp.now();
                           });
                         },
                         child: Column(
@@ -142,9 +148,9 @@ class _FlashCardStudyPageState extends State<FlashCardStudyPage> {
     currentCard.lastStudied = Timestamp.now();
 
     if(response == 'Repeat')
-      {
-        widget.flashCards.add(widget.flashCards[globalIndex]);
-      }
+    {
+      widget.flashCards.add(widget.flashCards[globalIndex]);
+    }
 
     FirestoreManager().UpdateFlashCardStatusAndLastStudied(currentCard, widget.deckId, userId!);
     FirestoreManager().AddFlashCardAttempt(newAttempt, widget.deckId, currentCard.docId, userId);
