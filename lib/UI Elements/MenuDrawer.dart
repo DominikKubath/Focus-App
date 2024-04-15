@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:studienarbeit_focus_app/Pages/AuthenticationPage.dart';
 import '../FirestoreManager.dart';
+import '../Pages/NotesPage.dart';
 import '../Pages/ToDoListPage.dart';
 import '../Pages/FlashCardsPage.dart';
 
@@ -30,7 +31,16 @@ class MenuDrawer extends StatelessWidget {
               },
             ),
             ListTile(
-              title: Text('Kalender'),
+              title: Text('Notes'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotesPage()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Calendar'),
               onTap: () {
                 // Handle item 2 click
                 Navigator.pop(context); // Close the drawer
