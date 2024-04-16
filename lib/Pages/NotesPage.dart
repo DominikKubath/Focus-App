@@ -215,21 +215,3 @@ class _NotesPageState extends State<NotesPage> {
   }
 }
 
-class DocumentDetailsPage extends StatelessWidget {
-  final NoteDoc document;
-
-  DocumentDetailsPage({required this.document});
-
-  @override
-  Widget build(BuildContext context) {
-    // Implement document details page UI here
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(document.docName),
-      ),
-      body: Center(
-        child: Text('Document Details'),
-      ),
-    );
-  }
-}

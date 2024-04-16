@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:studienarbeit_focus_app/FirestoreManager.dart';
 
 import 'Classes/NoteDoc.dart';
 import 'Classes/SharedDoc.dart';
@@ -47,28 +48,44 @@ class NotesManager {
 
         var subcollection = sharingUserDoc.reference.collection(notesCollectionName); // Navigate to subcollection
         var retrievedDocumentSnapshot = await subcollection.doc(shared.sharedDocId).get();
-        debugPrint("SHARED NOTE " + retrievedDocumentSnapshot.data().toString());
 
-        debugPrint("SharedDocs Count: " + sharedDocs.length.toString());
         var noteDoc = NoteDoc.fromDoc(retrievedDocumentSnapshot);
+        debugPrint("Shared Doc: " + noteDoc.docName.toString());
+        debugPrint("Shared Doc: " + noteDoc.content.toString());
         noteDoc.ownerId = shared.sharedBy;
         sharedDocs.add(noteDoc);
-        debugPrint("NoteDoc: " + noteDoc.docName.toString());
-        debugPrint("NoteDoc: " + noteDoc.docId.toString());
-
-
-        debugPrint("GOT NOTE " + sharedDocSnapshot.data().toString());
       }
     }
     return sharedDocs;
   }
 
-  //NoteId is the ID of the Shared Document
-  //email is the email address of the user that the access is given to
-  //uid is always the id of the current user
-  void GiveAccessToDocument(String noteId, String email, String uid)
+  void UpdateDocumentContent(String docId, String newContent, String uid) async
   {
+    var user = await FirestoreManager().GetCurrentUser(uid);
+    userCollection.doc(user.id).collection(notesCollectionName).doc(docId).update({"content" : newContent});
+  }
 
+  void UpdateDocumentName(String docId, String newName, String uid) async
+  {
+    var user = await FirestoreManager().GetCurrentUser(uid);
+    userCollection.doc(user.id).collection(notesCollectionName).doc(docId).update({"name" : newName});
+  }
+
+
+  //email is the email address of the user that the access is given to
+  //NoteId is the ID of the Shared Document
+  //uid is always the id of the current user
+  Future<Future<DocumentReference<Map<String, dynamic>>>> GiveAccessToDocument(String noteId, String email, String uid) async
+  {
+    var snapshot = await userCollection.where("email", isEqualTo: email).limit(1).get();
+    var userDoc = snapshot.docs.first;
+
+    Map<String, dynamic> sharedDoc = {
+      SharedDoc.sharedByFieldName : uid,
+      SharedDoc.sharedDocFieldName : noteId,
+    };
+
+    return userCollection.doc(userDoc.id).collection(sharedNotesCollectionName).add(sharedDoc);
   }
 
 }
