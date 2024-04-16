@@ -119,7 +119,7 @@ class _DocumentPageState extends State<DocumentPage> {
                         _isTyping = true;
                       });
                       _debounceTimer.cancel();
-                      _debounceTimer = Timer(Duration(milliseconds: 500), () {
+                      _debounceTimer = Timer(Duration(milliseconds: 200), () {
                         // This function will be called after the user stops typing for 500 milliseconds
                         setState(() {
                           _isTyping = false;
