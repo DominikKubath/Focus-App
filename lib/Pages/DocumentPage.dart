@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:studienarbeit_focus_app/UI Elements/MenuDrawer.dart';
@@ -20,6 +22,7 @@ class _DocumentPageState extends State<DocumentPage> {
   late TextEditingController _titleController;
   late TextEditingController _contentController;
   late TextSelection _lastSelection;
+  late Timer _debounceTimer;
   bool _isTyping = false;
 
   @override
@@ -31,6 +34,7 @@ class _DocumentPageState extends State<DocumentPage> {
 
     // Add listener to content controller to update cursor position
     _contentController.addListener(_onCursorPositionChanged);
+    _debounceTimer = Timer(Duration(milliseconds: 500), () {});
   }
 
   @override
@@ -114,13 +118,15 @@ class _DocumentPageState extends State<DocumentPage> {
                       setState(() {
                         _isTyping = true;
                       });
+                      _debounceTimer.cancel();
+                      _debounceTimer = Timer(Duration(milliseconds: 500), () {
+                        // This function will be called after the user stops typing for 500 milliseconds
+                        setState(() {
+                          _isTyping = false;
+                        });
+                      });
                       // Update content in database
                       NotesManager().UpdateDocumentContent(widget.document.docId, newContent, widget.document.ownerId);
-                    },
-                    onSubmitted: (value) {
-                      setState(() {
-                        _isTyping = false;
-                      });
                     },
                   ),
                 ),
