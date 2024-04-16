@@ -20,6 +20,7 @@ class _DocumentPageState extends State<DocumentPage> {
   late TextEditingController _titleController;
   late TextEditingController _contentController;
   late TextSelection _lastSelection;
+  bool _isTyping = false;
 
   @override
   void initState() {
@@ -27,6 +28,9 @@ class _DocumentPageState extends State<DocumentPage> {
     _titleController = TextEditingController(text: widget.document.docName);
     _contentController = TextEditingController(text: widget.document.content);
     _lastSelection = TextSelection.collapsed(offset: 0);
+
+    // Add listener to content controller to update cursor position
+    _contentController.addListener(_onCursorPositionChanged);
   }
 
   @override
@@ -85,16 +89,11 @@ class _DocumentPageState extends State<DocumentPage> {
           var documentData = snapshot.data as DocumentSnapshot;
           var content = documentData['content'] as String;
 
-          var previousSelection = _contentController.selection;
-
-          // Update content in the text controller
-          _contentController.text = content;
-
-          final newTextLength = _contentController.text.length;
-          final newCursorPosition = _lastSelection.baseOffset <= newTextLength
-              ? _lastSelection.baseOffset
-              : newTextLength;
-          _contentController.selection = TextSelection.fromPosition(TextPosition(offset: newCursorPosition));
+          // Update content in the text controller only if user is not typing
+          if (!_isTyping) {
+            _contentController.text = content;
+            _lastSelection = _contentController.selection;
+          }
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
@@ -112,9 +111,16 @@ class _DocumentPageState extends State<DocumentPage> {
                       hintText: 'Enter document content',
                     ),
                     onChanged: (newContent) {
-                      _lastSelection = _contentController.selection;
+                      setState(() {
+                        _isTyping = true;
+                      });
                       // Update content in database
                       NotesManager().UpdateDocumentContent(widget.document.docId, newContent, widget.document.ownerId);
+                    },
+                    onSubmitted: (value) {
+                      setState(() {
+                        _isTyping = false;
+                      });
                     },
                   ),
                 ),
@@ -181,12 +187,19 @@ class _DocumentPageState extends State<DocumentPage> {
     );
   }
 
-
+  // Function to update cursor position
+  void _onCursorPositionChanged() {
+    if (!_isTyping) {
+      _lastSelection = _contentController.selection;
+    }
+  }
 
   @override
   void dispose() {
     _titleController.dispose();
     _contentController.dispose();
+    // Remove listener to avoid memory leaks
+    _contentController.removeListener(_onCursorPositionChanged);
     super.dispose();
   }
 }
