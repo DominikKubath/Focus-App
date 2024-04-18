@@ -15,6 +15,7 @@ class NotesPage extends StatefulWidget {
 class _NotesPageState extends State<NotesPage> {
   late Future<List<NoteDoc>> usersDocs;
   late Future<List<NoteDoc>> sharedDocs;
+  final Color primaryColor = Color(0xFF009688);
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +51,7 @@ class _NotesPageState extends State<NotesPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        'Documents Shared by Other Users',
+                        '   Documents Shared by Other Users',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -62,8 +63,8 @@ class _NotesPageState extends State<NotesPage> {
                         physics: NeverScrollableScrollPhysics(),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 8, // Number of columns in the grid
-                          mainAxisSpacing: 8.0, // Spacing between rows
-                          crossAxisSpacing: 8.0, // Spacing between columns
+                          mainAxisSpacing: 20.0, // Spacing between rows
+                          crossAxisSpacing: 20.0, // Spacing between columns
                         ),
                         itemCount: sharedDocuments.length,
                         itemBuilder: (context, index) {
@@ -97,6 +98,9 @@ class _NotesPageState extends State<NotesPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20.0),
+                          ),
                           Text(
                             'Your Documents',
                             style: TextStyle(
@@ -105,12 +109,20 @@ class _NotesPageState extends State<NotesPage> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(left: 2.0), // Add padding to the end of the text
-                            child: ElevatedButton(
+                            padding: const EdgeInsets.all(20.0), // Add padding to the end of the text
+                            child: TextButton(
                               onPressed: () {
-                                // Add functionality to the button here
+
                               },
-                              child: Text('Add Document'),
+                              style: TextButton.styleFrom(
+                                backgroundColor: primaryColor, // Add background color
+                              ),
+                              child: Text(
+                                'Create New Document',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -121,8 +133,8 @@ class _NotesPageState extends State<NotesPage> {
                         physics: NeverScrollableScrollPhysics(),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 8, // Number of columns in the grid
-                          mainAxisSpacing: 8.0, // Spacing between rows
-                          crossAxisSpacing: 8.0, // Spacing between columns
+                          mainAxisSpacing: 20.0, // Spacing between rows
+                          crossAxisSpacing: 20.0, // Spacing between columns
                         ),
                         itemCount: userDocuments.length,
                         itemBuilder: (context, index) {
@@ -143,6 +155,7 @@ class _NotesPageState extends State<NotesPage> {
   Widget _buildDocumentItem(NoteDoc doc) {
     return Card(
       child: InkWell(
+        hoverColor: Colors.blueGrey,
         onTap: () async {
           QuerySnapshot userQuerySnapshot = await FirebaseFirestore.instance
               .collection('user')
@@ -173,6 +186,7 @@ class _NotesPageState extends State<NotesPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Padding(padding: const EdgeInsets.all(20.0),),
             Text(
               doc.docName,
               textAlign: TextAlign.center,

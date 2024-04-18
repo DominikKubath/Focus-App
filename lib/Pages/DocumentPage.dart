@@ -24,6 +24,7 @@ class _DocumentPageState extends State<DocumentPage> {
   late TextSelection _lastSelection;
   late Timer _debounceTimer;
   bool _isTyping = false;
+  final Color primaryColor = Color(0xFF009688);
 
   @override
   void initState() {
@@ -68,7 +69,7 @@ class _DocumentPageState extends State<DocumentPage> {
                     _showCollaboratePopup(context);
                   },
                   style: TextButton.styleFrom(
-                    backgroundColor: Colors.blue, // Add background color
+                    backgroundColor: primaryColor, // Add background color
                   ),
                   child: Text(
                     'Collaborate',
@@ -120,7 +121,7 @@ class _DocumentPageState extends State<DocumentPage> {
                       });
                       _debounceTimer.cancel();
                       _debounceTimer = Timer(Duration(milliseconds: 200), () {
-                        // This function will be called after the user stops typing for 500 milliseconds
+
                         setState(() {
                           _isTyping = false;
                         });
