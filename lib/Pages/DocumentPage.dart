@@ -21,7 +21,8 @@ class DocumentPage extends StatefulWidget {
 class _DocumentPageState extends State<DocumentPage> {
   late TextEditingController _titleController;
   late TextEditingController _contentController;
-  late TextSelection _lastSelection;
+  late int _startCursorPosition;
+  late int _textLengthBeforeChange;
   late Timer _debounceTimer;
   bool _isTyping = false;
   final Color primaryColor = Color(0xFF009688);
@@ -31,10 +32,11 @@ class _DocumentPageState extends State<DocumentPage> {
     super.initState();
     _titleController = TextEditingController(text: widget.document.docName);
     _contentController = TextEditingController(text: widget.document.content);
-    _lastSelection = TextSelection.collapsed(offset: 0);
+    _startCursorPosition = _contentController.selection.baseOffset;
+    _textLengthBeforeChange = _contentController.text.length;
 
     // Add listener to content controller to update cursor position
-    _contentController.addListener(_onCursorPositionChanged);
+    _contentController.addListener(_onTextChange);
     _debounceTimer = Timer(Duration(milliseconds: 500), () {});
   }
 
@@ -92,12 +94,16 @@ class _DocumentPageState extends State<DocumentPage> {
           }
 
           var documentData = snapshot.data as DocumentSnapshot;
-          var content = documentData['content'] as String;
+          var content = documentData['content'] as String?;
 
           // Update content in the text controller only if user is not typing
           if (!_isTyping) {
-            _contentController.text = content;
-            _lastSelection = _contentController.selection;
+            _contentController.value = TextEditingValue(
+              text: content ?? '',
+              selection: TextSelection.collapsed(
+                offset: _startCursorPosition + (_contentController.text.length - _textLengthBeforeChange),
+              ),
+            );
           }
 
           return Padding(
@@ -121,9 +127,10 @@ class _DocumentPageState extends State<DocumentPage> {
                       });
                       _debounceTimer.cancel();
                       _debounceTimer = Timer(Duration(milliseconds: 200), () {
-
                         setState(() {
                           _isTyping = false;
+                          _textLengthBeforeChange = _contentController.text.length;
+                          _startCursorPosition = _contentController.selection.baseOffset;
                         });
                       });
                       // Update content in database
@@ -195,9 +202,10 @@ class _DocumentPageState extends State<DocumentPage> {
   }
 
   // Function to update cursor position
-  void _onCursorPositionChanged() {
+  void _onTextChange() {
     if (!_isTyping) {
-      _lastSelection = _contentController.selection;
+      _startCursorPosition = _contentController.selection.baseOffset;
+      _textLengthBeforeChange = _contentController.text.length;
     }
   }
 
@@ -206,7 +214,8 @@ class _DocumentPageState extends State<DocumentPage> {
     _titleController.dispose();
     _contentController.dispose();
     // Remove listener to avoid memory leaks
-    _contentController.removeListener(_onCursorPositionChanged);
+    _contentController.removeListener(_onTextChange);
     super.dispose();
   }
 }
+

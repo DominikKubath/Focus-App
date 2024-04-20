@@ -59,6 +59,15 @@ class NotesManager {
     return sharedDocs;
   }
 
+  Future<DocumentReference<Map<String, dynamic>>> CreateDocument(String uid) async
+  {
+    var user = await FirestoreManager().GetCurrentUser(uid);
+    var doc = NoteDoc.empty();
+    doc.docName = "";
+    doc.content = "";
+    return userCollection.doc(user.id).collection(notesCollectionName).add(doc.ToMap());
+  }
+
   void UpdateDocumentContent(String docId, String newContent, String uid) async
   {
     var user = await FirestoreManager().GetCurrentUser(uid);

@@ -111,8 +111,22 @@ class _NotesPageState extends State<NotesPage> {
                           Padding(
                             padding: const EdgeInsets.all(20.0), // Add padding to the end of the text
                             child: TextButton(
-                              onPressed: () {
-
+                              onPressed: () async {
+                                String? user = await FirestoreManager().ReadUid(context);
+                                if(user != null)
+                                {
+                                  NoteDoc? doc = await CreateNewDocument();
+                                  if(doc != null)
+                                  {
+                                      _buildDocumentItem(doc);
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => NotesPage(), // Pass the document to the details page
+                                          ),
+                                              (route) => false);
+                                  }
+                                }
                               },
                               style: TextButton.styleFrom(
                                 backgroundColor: primaryColor, // Add background color
@@ -204,6 +218,23 @@ class _NotesPageState extends State<NotesPage> {
         ),
       ),
     );
+  }
+
+  Future<NoteDoc?> CreateNewDocument() async
+  {
+    String? userId = await FirestoreManager().ReadUid(context);
+    if (userId != null) {
+      var document = await NotesManager().CreateDocument(userId);
+      debugPrint("Created new Doc");
+      NoteDoc createdDoc = NoteDoc.empty();
+      createdDoc.docId = document.id;
+      createdDoc.ownerId = userId;
+      createdDoc.content = "";
+      createdDoc.docName = "";
+      return createdDoc;
+    } else {
+      return null;
+    }
   }
 
   Future<List<NoteDoc>> _getAllDocuments() async {
