@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:studienarbeit_focus_app/Classes/FlashCard.dart';
 
 import '../FirestoreManager.dart';
+import '../ScoreManager.dart';
 import 'FlashCardsPage.dart';
 
 class AddFlashCardPage extends StatefulWidget {
@@ -68,6 +69,7 @@ class _AddFlashCardPageState extends State<AddFlashCardPage> {
 
                 // Check if the result is successful
                 if (result != null) {
+                  ScoreManager().UpdateTodaysScore(10, uid);
                   // Show SnackBar with the message "New Card Added!"
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

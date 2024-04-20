@@ -24,8 +24,7 @@ class FirestoreManager {
   static const String flashCardDecksCollectionName = "flashcards";
   static const String flashCardContentCollectionName = "content";
   static const String flashCardAttemptCollectionName = "attempts";
-
-
+  
 
   Future<List<FlashCardDeck>> GetAllFlashCardDecks(String uid) async
   {

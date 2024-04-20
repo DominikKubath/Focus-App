@@ -4,6 +4,7 @@ import '../Pages/ToDoItemPage.dart';
 import '../Classes/ToDoItem.dart';
 import '../Constants/ColorPalette.dart';
 import '../Classes/Utils.dart';
+import '../ScoreManager.dart';
 import '../ToDoManager.dart';
 import 'EditToDoDialog.dart';
 import '../UI Elements/DeleteConfirmationDialog.dart';
@@ -82,43 +83,59 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
   }
 }
 
-class CheckBoxButton extends StatelessWidget {
+class CheckBoxButton extends StatefulWidget {
   final bool isChecked;
-  final ValueChanged<bool>? onChanged;
   final String todoId;
+  final Function(bool isChecked) onChanged;
 
   const CheckBoxButton({
     Key? key,
     required this.isChecked,
-    this.onChanged,
     required this.todoId,
+    required this.onChanged,
   }) : super(key: key);
+
+  @override
+  _CheckBoxButtonState createState() => _CheckBoxButtonState();
+}
+
+class _CheckBoxButtonState extends State<CheckBoxButton> {
+  late bool _isChecked;
+
+  @override
+  void initState() {
+    super.initState();
+    _isChecked = widget.isChecked;
+  }
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
       icon: Icon(
-        isChecked ? Icons.check_box : Icons.check_box_outline_blank,
-        color: isChecked ? Colors.green : Colors.grey,
+        _isChecked ? Icons.check_box : Icons.check_box_outline_blank,
+        color: _isChecked ? Colors.green : Colors.grey,
       ),
       onPressed: () async {
         String? uid = await FirestoreManager().ReadUid(context);
-        if (onChanged != null) {
-          onChanged!(!isChecked);
-          // Call the appropriate method based on the isChecked state
-          if(uid != null)
-          {
-            if (isChecked) {
-              ToDoManager().MarkToDoAsNotDone(todoId, uid);
-            } else {
-              ToDoManager().MarkToDoAsDone(todoId, uid);
-            }
+        if (uid != null) {
+          widget.onChanged(!_isChecked);
+          setState(() {
+            _isChecked = !_isChecked;
+          });
+          // Call the appropriate method based on the _isChecked state
+          if (_isChecked) {
+            ToDoManager().MarkToDoAsDone(widget.todoId, uid);
+            ScoreManager().UpdateTodaysScore(25, uid);
+          } else {
+            ToDoManager().MarkToDoAsNotDone(widget.todoId, uid);
+            ScoreManager().UpdateTodaysScore(-25, uid);
           }
         }
       },
     );
   }
 }
+
 
 
 
