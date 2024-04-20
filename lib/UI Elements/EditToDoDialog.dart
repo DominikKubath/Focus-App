@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../Classes/ToDoItem.dart';
 import '../FirestoreManager.dart';
 import '../Pages/ToDoListPage.dart';
+import '../ToDoManager.dart';
 
 class EditToDoDialog {
   static void showEditDialog(BuildContext context, String title, String description, String id, int priority) {
@@ -59,7 +60,7 @@ class EditToDoDialog {
                       todo.priority = currentPriority;
                       todo.isDone = false;
 
-                      FirestoreManager().UpdateToDoItem(todo, userId);
+                      ToDoManager().UpdateToDoItem(todo, userId);
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (context) => ToDoListPage()),

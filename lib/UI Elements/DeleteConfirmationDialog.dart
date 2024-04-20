@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../Classes/ToDoItem.dart';
 import '../FirestoreManager.dart';
 import '../Pages/ToDoListPage.dart';
+import '../ToDoManager.dart';
 
 class DeleteConfirmationDialog {
   static Future<bool> show(BuildContext context) async {
@@ -34,7 +35,7 @@ class DeleteConfirmationDialog {
       if (userId != null) {
         ToDoItem todo = ToDoItem.empty();
         todo.id = id;
-        FirestoreManager().DeleteToDoItem(todo, userId);
+        ToDoManager().DeleteToDoItem(todo, userId);
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => ToDoListPage()),

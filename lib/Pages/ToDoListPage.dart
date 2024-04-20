@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:studienarbeit_focus_app/Pages/CreateNewToDoItem.dart';
 import 'package:studienarbeit_focus_app/UI%20Elements/ToDoItemWidget.dart';
+import '../ToDoManager.dart';
 import '../UI Elements/MenuDrawer.dart';
 import '../Classes/ToDoItem.dart';
 
 import '../FirestoreManager.dart';
+import 'CreateNewToDoItem.dart'; // Update import to the new dialog file
 
 class ToDoListPage extends StatefulWidget {
   @override
@@ -82,7 +83,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
   Future<List<ToDoItem>> _getToDoItems() async {
     String? userId = await FirestoreManager().ReadUid(context);
     if (userId != null) {
-      return FirestoreManager().GetAllToDos(userId);
+      return ToDoManager().GetAllToDos(userId);
     } else {
       return [];
     }
@@ -95,9 +96,9 @@ class CreateNewToDoButton extends StatelessWidget {
     return Container(
       child: ElevatedButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => CreateNewToDoPage()));
-      },
-      child: Text('Create new ToDo'),
+          CreateNewToDoDialog.show(context); // Call the show method of the dialog
+        },
+        child: Text('Create new ToDo'),
       ),
     );
   }
