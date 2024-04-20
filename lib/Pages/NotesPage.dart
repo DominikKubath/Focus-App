@@ -196,29 +196,102 @@ class _NotesPageState extends State<NotesPage> {
             );
           }
         },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(padding: const EdgeInsets.all(20.0),),
-            Text(
-              doc.docName,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      doc.docName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (String choice) {
+                      if (choice == 'Delete') {
+                        // Show confirmation dialog
+                        _showDeleteConfirmation(context, doc);
+                      }
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          value: 'Delete',
+                          child: Text('Delete'),
+                        ),
+                      ];
+                    },
+                  ),
+                ],
               ),
-            ),
-            SizedBox(height: 8.0),
-            Icon(
-              Icons.description,
-              size: 64.0,
-              color: Colors.blue,
-            ),
-          ],
+              SizedBox(height: 16.0),
+              Icon(
+                Icons.description,
+                size: 64.0,
+                color: Colors.blue,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
+  void _showDeleteConfirmation(BuildContext context, NoteDoc doc) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Delete'),
+          content: Text('Are you sure you want to delete this document?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Call delete function if confirmed
+                _deleteDocument(doc);
+                Navigator.of(context).pop();
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NotesPage(),
+                    ),
+                        (route) => false);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Document Deleted!'),
+                    duration: Duration(seconds: 2), // Adjust duration as needed
+                  ),
+                );
+              },
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteDocument(NoteDoc doc) async {
+    String? userId = await FirestoreManager().ReadUid(context);
+    if(userId != null)
+    {
+        NotesManager().DeleteDocument(doc.docId, userId);
+    }
+  }
+
+
+
 
   Future<NoteDoc?> CreateNewDocument() async
   {

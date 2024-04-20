@@ -68,6 +68,12 @@ class NotesManager {
     return userCollection.doc(user.id).collection(notesCollectionName).add(doc.ToMap());
   }
 
+  void DeleteDocument(String docId, String uid) async
+  {
+    var user = await FirestoreManager().GetCurrentUser(uid);
+    userCollection.doc(user.id).collection(notesCollectionName).doc(docId).delete();
+  }
+
   void UpdateDocumentContent(String docId, String newContent, String uid) async
   {
     var user = await FirestoreManager().GetCurrentUser(uid);
