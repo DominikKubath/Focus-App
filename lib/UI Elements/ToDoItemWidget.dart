@@ -8,6 +8,7 @@ import '../ScoreManager.dart';
 import '../ToDoManager.dart';
 import 'EditToDoDialog.dart';
 import '../UI Elements/DeleteConfirmationDialog.dart';
+import 'ScoreAnimationWidget.dart';
 
 class ToDoItemWidget extends StatefulWidget {
   final String title;
@@ -110,28 +111,31 @@ class _CheckBoxButtonState extends State<CheckBoxButton> {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(
-        _isChecked ? Icons.check_box : Icons.check_box_outline_blank,
-        color: _isChecked ? Colors.green : Colors.grey,
-      ),
-      onPressed: () async {
-        String? uid = await FirestoreManager().ReadUid(context);
-        if (uid != null) {
-          widget.onChanged(!_isChecked);
-          setState(() {
-            _isChecked = !_isChecked;
-          });
-
-          if (_isChecked) {
-            ToDoManager().MarkToDoAsDone(widget.todoId, uid);
-            ScoreManager().UpdateTodaysScore(25, uid);
-          } else {
-            ToDoManager().MarkToDoAsNotDone(widget.todoId, uid);
-            ScoreManager().UpdateTodaysScore(-25, uid);
-          }
-        }
-      },
+    return Stack(
+      children: [
+        IconButton(
+          icon: Icon(
+            _isChecked ? Icons.check_box : Icons.check_box_outline_blank,
+            color: _isChecked ? Colors.green : Colors.grey,
+          ),
+          onPressed: () async {
+            String? uid = await FirestoreManager().ReadUid(context);
+            if (uid != null) {
+              setState(() {
+                _isChecked = !_isChecked;
+              });
+              widget.onChanged(_isChecked);
+              if (_isChecked) {
+                ToDoManager().MarkToDoAsDone(widget.todoId, uid);
+                ScoreManager().UpdateTodaysScore(25, uid);
+              } else {
+                ToDoManager().MarkToDoAsNotDone(widget.todoId, uid);
+                ScoreManager().UpdateTodaysScore(-25, uid);
+              }
+            }
+          },
+        ),
+      ],
     );
   }
 }

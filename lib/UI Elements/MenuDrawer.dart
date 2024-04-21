@@ -17,21 +17,35 @@ class MenuDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          DrawerHeader(
-            child: Consumer<TimerModel>(
-              builder: (context, timerModel, _) {
-                return Text(
-                  timerModel.isRunning ? _formatDuration(timerModel.duration) : 'Study Timer Not Running',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 32,
-                  ),
-                );
-              },
-            ),
+          Container(
             decoration: BoxDecoration(
-              color: primaryColor,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: Provider.of<TimerModel>(context).isRunning
+                    ? [Colors.red, Colors.white] // Red gradient when timer is running
+                    : [Colors.green, Colors.white], // Green gradient when timer is not running
+              ),
+            ),
+            child: DrawerHeader(
+              padding: EdgeInsets.all(0),
+              child: Container(
+                color: Colors.transparent, // Set the background color of the DrawerHeader to transparent
+                child: Consumer<TimerModel>(
+                  builder: (context, timerModel, _) {
+                    return Center(
+                      child: Text(
+                        timerModel.isRunning ? _formatDuration(timerModel.duration) : 'Study Timer Not Running',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 32,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
           ListTile(
