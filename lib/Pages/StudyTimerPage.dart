@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studienarbeit_focus_app/FirestoreManager.dart';
 import 'package:studienarbeit_focus_app/UI%20Elements/MenuDrawer.dart';
+import '../ScoreManager.dart';
 import '../main.dart';
 
 class StudyTimerPage extends StatefulWidget {
@@ -129,11 +131,16 @@ class _StudyTimerPageState extends State<StudyTimerPage> {
     return '${duration.inHours}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}';
   }
 
-  void onTimerFinished(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Timer ran out!'),
-      ),
-    );
+  void onTimerFinished(BuildContext context) async {
+    var userId = await FirestoreManager().ReadUid(context);
+    if(userId != null)
+    {
+      ScoreManager().UpdateTodaysScore(30, userId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Timer ran out!    +30 Productivity Points!'),
+        ),
+      );
+    }
   }
 }

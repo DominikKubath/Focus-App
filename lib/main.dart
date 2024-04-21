@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       create: (context) => TimerModel(),
       child: MaterialApp(
         theme: ThemeData(
-            primaryColor: primaryColor,
+          primaryColor: primaryColor,
         ),
         home: StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),
@@ -57,6 +57,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 
 class TimerModel extends ChangeNotifier {
   Duration _duration = Duration(minutes: 25);
@@ -117,6 +118,3 @@ class TimerModel extends ChangeNotifier {
   }
 
 }
-
-
-
