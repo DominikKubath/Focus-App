@@ -68,17 +68,17 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconButton(
+          /*IconButton(
             icon: const Icon(Icons.edit, color: ColorPalette.funcBlue),
             onPressed: () => EditToDoDialog.showEditDialog(context, widget.title, widget.description, widget.id, widget.priority),
-          ),
+          ),*/
           IconButton(
             icon: const Icon(Icons.delete, color: ColorPalette.funcBlue),
             onPressed: () => DeleteConfirmationDialog.DeleteToDoItem(context, widget.id),
           ),
         ],
       ),
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ToDoItemPage(id: widget.id))),
+      onTap: () => EditToDoDialog.showEditDialog(context, widget.title, widget.description, widget.id, widget.priority),
     );
   }
 }
@@ -122,7 +122,7 @@ class _CheckBoxButtonState extends State<CheckBoxButton> {
           setState(() {
             _isChecked = !_isChecked;
           });
-          // Call the appropriate method based on the _isChecked state
+
           if (_isChecked) {
             ToDoManager().MarkToDoAsDone(widget.todoId, uid);
             ScoreManager().UpdateTodaysScore(25, uid);
@@ -135,7 +135,3 @@ class _CheckBoxButtonState extends State<CheckBoxButton> {
     );
   }
 }
-
-
-
-

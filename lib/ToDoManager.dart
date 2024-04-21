@@ -34,6 +34,21 @@ class ToDoManager {
     userCollection.doc(userDoc.docs[0].id).collection("todos").add(newItem.ToMap());
   }
 
+  void UpdateToDoItemField(String todoId, String fieldName, String newValue, bool isNumerical, String uid) async
+  {
+    var userDoc = await userCollection.where("uid", isEqualTo: uid).get();
+
+    if(isNumerical)
+    {
+      int prio = int.parse(newValue);
+      userCollection.doc(userDoc.docs[0].id).collection("todos").doc(todoId).update({fieldName : prio});
+    }
+    else
+    {
+      userCollection.doc(userDoc.docs[0].id).collection("todos").doc(todoId).update({fieldName : newValue});
+    }
+  }
+
   void MarkToDoAsDone(String todoId, String uid) async
   {
     var userDoc = await userCollection.where("uid", isEqualTo: uid).get();
