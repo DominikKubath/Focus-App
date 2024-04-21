@@ -62,6 +62,7 @@ class TimerModel extends ChangeNotifier {
   Duration _duration = Duration(minutes: 25);
   bool _isRunning = false;
   late Timer _timer;
+  VoidCallback? _onTimerFinished;
 
   Duration get duration => _duration;
   bool get isRunning => _isRunning;
@@ -83,16 +84,21 @@ class TimerModel extends ChangeNotifier {
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
         if (_duration.inSeconds > 0) {
           _duration = Duration(seconds: _duration.inSeconds - 1);
-          notifyListeners();
+          notifyListeners(); // Notify listeners about the change in duration
         } else {
           _isRunning = false;
           _timer.cancel();
-          notifyListeners();
+          if (_onTimerFinished != null) {
+            _onTimerFinished!();
+          }
         }
       });
       _isRunning = true;
-      notifyListeners();
     }
+  }
+
+  void setOnTimerFinishedCallback(VoidCallback onTimerFinished) {
+    _onTimerFinished = onTimerFinished;
   }
 
   void pauseTimer() {
