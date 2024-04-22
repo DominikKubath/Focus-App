@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:studienarbeit_focus_app/Classes/FlashCardStatistic.dart';
 import 'package:studienarbeit_focus_app/Classes/TodoStatistic.dart';
+import 'package:studienarbeit_focus_app/UI%20Elements/FlashCardStats.dart';
 import 'package:studienarbeit_focus_app/UI%20Elements/MenuDrawer.dart';
 
 import '../Classes/Score.dart';
@@ -10,6 +11,7 @@ import '../FirestoreManager.dart';
 import '../ScoreManager.dart';
 import '../ToDoManager.dart';
 import '../UI Elements/ScoreStats.dart';
+import '../UI Elements/TimerStats.dart';
 import '../UI Elements/TodoStats.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   late Future<List<TodoStatistic>?> todoStats;
   late Future<List<FlashCardStatistic>?> cardStats;
   late Future<List<Score>?> timerStats;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -45,6 +48,7 @@ class _HomePageState extends State<HomePage> {
       drawer: MenuDrawer(),
       backgroundColor: Colors.black87,
       body: Scrollbar(
+        controller: _scrollController,
         child: Padding(
           padding: const EdgeInsets.all(20.0), // Add padding for better spacing
           child: FutureBuilder(
@@ -66,42 +70,100 @@ class _HomePageState extends State<HomePage> {
                     } else {
                       List<TodoStatistic>? todoStats =
                       todoSnapshot.data as List<TodoStatistic>?;
-                      return ListView(
-                        children: [
-                          Text(
-                            'Welcome back!',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          Text(
-                            'Your Productivity Points The Past Week:',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          scores != null
-                              ? ScoreStatsWidget(scores: scores)
-                              : Text('No scores available'),
-                          SizedBox(height: 20),
-                          Text(
-                            'Your ToDo Statistics:',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          // Add your TodoStatsWidget here
-                          TodoStatsWidget(todoStats: todoStats ?? []),
-                        ],
+                      return FutureBuilder(
+                        future: cardStats,
+                        builder: (context, cardSnapshot) {
+                          if (cardSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                                child: CircularProgressIndicator());
+                          } else if (cardSnapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${cardSnapshot.error}'));
+                          } else {
+                            List<FlashCardStatistic>? cardStats =
+                            cardSnapshot.data as List<FlashCardStatistic>?;
+                            return FutureBuilder(
+                              future: timerStats,
+                              builder: (context, timerSnapshot) {
+                                if (timerSnapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                } else if (timerSnapshot.hasError) {
+                                  return Center(
+                                      child: Text(
+                                          'Error: ${timerSnapshot.error}'));
+                                } else {
+                                  List<Score>? timerStats =
+                                  timerSnapshot.data as List<Score>?;
+                                  return ListView(
+                                    children: [
+                                      Text(
+                                        'Welcome back!',
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 50),
+                                      Text(
+                                        'Your Productivity Points The Past Week:',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 50),
+                                      scores != null
+                                          ? ScoreStatsWidget(scores: scores)
+                                          : Text('No scores available'),
+                                      SizedBox(height: 50),
+                                      Text(
+                                        'Your ToDo Statistics:',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 50),
+                                      // Add your TodoStatsWidget here
+                                      TodoStatsWidget(todoStats: todoStats ?? []),
+                                      SizedBox(height: 50),
+                                      Text(
+                                        'Your FlashCard Statistics:',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 50),
+                                      // Add your FlashCardStatsWidget here
+                                      FlashCardStatsWidget(
+                                          flashCardStats: cardStats ?? []),
+                                      SizedBox(height: 50),
+                                      Text(
+                                        'Your Timer Intervals:',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      SizedBox(height: 20),
+                                      // Add your TimerStatsWidget here
+                                      TimerStatsWidget(timeStats: timerStats ?? []),
+                                    ],
+                                  );
+                                }
+                              },
+                            );
+                          }
+                        },
                       );
                     }
                   },

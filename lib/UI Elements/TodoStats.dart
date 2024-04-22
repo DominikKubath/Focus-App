@@ -259,7 +259,3 @@ class TodoStatsWidget extends StatelessWidget {
   }
 
 }
-
-
-
-
