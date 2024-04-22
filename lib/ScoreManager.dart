@@ -11,7 +11,12 @@ class ScoreManager {
 
   static const String scoreCollectionName = "scores";
 
-  Future<Score?> GetTodaysScore(String uid) async
+  static const String timerStatsCollectionName = "timerStats";
+
+
+  //Even tho the architecture is retarded AF - I want to reduce redundancies
+  //So those methods for the score is also used for the study Timer stats
+  Future<Score?> GetTodaysScore(String collectionName, String uid) async
   {
     var userDoc = await FirestoreManager().GetCurrentUser(uid);
     if(userDoc != null)
@@ -21,7 +26,7 @@ class ScoreManager {
         DateTime startOfToday = DateTime(today.year, today.month, today.day);
         QuerySnapshot querySnapshot = await userCollection
             .doc(userDoc.id)
-            .collection(scoreCollectionName)
+            .collection(collectionName)
             .where(Score.dateFieldName, isGreaterThanOrEqualTo: Timestamp.fromDate(startOfToday))
             .where(Score.dateFieldName, isLessThan: Timestamp.fromDate(startOfToday.add(Duration(days: 1))))
             .limit(1)
@@ -40,19 +45,19 @@ class ScoreManager {
     }
   }
 
-  void UpdateTodaysScore(int amount, String uid) async {
+  void UpdateTodaysScore(String collectionName, int amount, String uid) async {
     var userDoc = await FirestoreManager().GetCurrentUser(uid);
     if (userDoc != null) {
       try {
         DateTime today = DateTime.now();
-        Score? todayScore = await GetTodaysScore(uid);
+        Score? todayScore = await GetTodaysScore(collectionName, uid);
         if (todayScore == null) {
-          CreateTodaysScoreIfNotExisting(uid, amount);
+          CreateTodaysScoreIfNotExisting(collectionName, uid, amount);
         } else {
           int updatedAmount = todayScore.amount + amount;
           await userCollection
               .doc(userDoc.id)
-              .collection(scoreCollectionName)
+              .collection(collectionName)
               .doc(todayScore.docId)
               .update({Score.amountFieldName: updatedAmount});
         }
@@ -63,15 +68,15 @@ class ScoreManager {
   }
 
 
-  void CreateTodaysScoreIfNotExisting(String uid, int initialAmount) async {
+  void CreateTodaysScoreIfNotExisting(String collectionName, String uid, int initialAmount) async {
     var userDoc = await FirestoreManager().GetCurrentUser(uid);
     if (userDoc != null) {
       try {
         DateTime today = DateTime.now();
         DateTime startOfToday = DateTime(today.year, today.month, today.day);
-        Score? todayScore = await GetTodaysScore(uid);
+        Score? todayScore = await GetTodaysScore(collectionName, uid);
         if (todayScore == null) {
-          await userCollection.doc(userDoc.id).collection(scoreCollectionName).add({
+          await userCollection.doc(userDoc.id).collection(collectionName).add({
             Score.amountFieldName: initialAmount,
             Score.dateFieldName: Timestamp.fromDate(startOfToday)
           });
@@ -83,7 +88,7 @@ class ScoreManager {
   }
 
 
-  Future<List<Score>?> GetScoresOfLastSevenDays(String uid) async {
+  Future<List<Score>?> GetScoresOfLastSevenDays(String collectionName, String uid) async {
     var userDoc = await FirestoreManager().GetCurrentUser(uid);
     if (userDoc != null) {
       try {
@@ -92,7 +97,7 @@ class ScoreManager {
 
         QuerySnapshot querySnapshot = await userCollection
             .doc(userDoc.id)
-            .collection(scoreCollectionName)
+            .collection(collectionName)
             .where(Score.dateFieldName, isGreaterThanOrEqualTo: Timestamp.fromDate(sevenDaysAgo))
             .where(Score.dateFieldName, isLessThan: Timestamp.fromDate(today))
             .orderBy(Score.dateFieldName, descending: true)

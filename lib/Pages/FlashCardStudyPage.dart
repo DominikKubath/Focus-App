@@ -153,16 +153,16 @@ class _FlashCardStudyPageState extends State<FlashCardStudyPage> {
       switch(response)
       {
         case 'Easy':
-          ScoreManager().UpdateTodaysScore(10, userId);
+          ScoreManager().UpdateTodaysScore(ScoreManager.scoreCollectionName, 10, userId);
           break;
         case 'Good':
-          ScoreManager().UpdateTodaysScore(5, userId);
+          ScoreManager().UpdateTodaysScore(ScoreManager.scoreCollectionName, 5, userId);
           break;
         case 'Hard':
-          ScoreManager().UpdateTodaysScore(2, userId);
+          ScoreManager().UpdateTodaysScore(ScoreManager.scoreCollectionName, 2, userId);
           break;
         case 'Repeat':
-          ScoreManager().UpdateTodaysScore(1, userId);
+          ScoreManager().UpdateTodaysScore(ScoreManager.scoreCollectionName, 1, userId);
           break;
       }
     }

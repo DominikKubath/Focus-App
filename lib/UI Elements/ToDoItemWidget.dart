@@ -127,10 +127,10 @@ class _CheckBoxButtonState extends State<CheckBoxButton> {
               widget.onChanged(_isChecked);
               if (_isChecked) {
                 ToDoManager().MarkToDoAsDone(widget.todoId, uid);
-                ScoreManager().UpdateTodaysScore(25, uid);
+                ScoreManager().UpdateTodaysScore(ScoreManager.scoreCollectionName, 25, uid);
               } else {
                 ToDoManager().MarkToDoAsNotDone(widget.todoId, uid);
-                ScoreManager().UpdateTodaysScore(-25, uid);
+                ScoreManager().UpdateTodaysScore(ScoreManager.scoreCollectionName, -25, uid);
               }
             }
           },

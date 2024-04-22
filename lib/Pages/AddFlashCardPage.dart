@@ -69,7 +69,7 @@ class _AddFlashCardPageState extends State<AddFlashCardPage> {
 
                 // Check if the result is successful
                 if (result != null) {
-                  ScoreManager().UpdateTodaysScore(10, uid);
+                  ScoreManager().UpdateTodaysScore(ScoreManager.scoreCollectionName, 10, uid);
                   // Show SnackBar with the message "New Card Added!"
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

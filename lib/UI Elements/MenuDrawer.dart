@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studienarbeit_focus_app/Pages/AuthenticationPage.dart';
+import 'package:studienarbeit_focus_app/Pages/BasePage.dart';
 import 'package:studienarbeit_focus_app/Pages/StudyTimerPage.dart';
 import '../Classes/Score.dart';
 import '../FirestoreManager.dart';
@@ -39,7 +40,7 @@ class MenuDrawer extends StatelessWidget {
 
     if(userId != null)
     {
-      Score? todaysScore = await ScoreManager().GetTodaysScore(userId);
+      Score? todaysScore = await ScoreManager().GetTodaysScore(ScoreManager.scoreCollectionName, userId);
       if(todaysScore != null)
       {
         return todaysScore.amount;
@@ -98,7 +99,16 @@ class MenuDrawer extends StatelessWidget {
           ),
         ),
         ListTile(
-          title: Text('To Do Liste'),
+          title: Text('Home / Statistics'),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+            );
+          },
+        ),
+        ListTile(
+          title: Text('To-Do List'),
           onTap: () {
             Navigator.push(
               context,
@@ -141,7 +151,7 @@ class MenuDrawer extends StatelessWidget {
           },
         ),
         ListTile(
-          title: Text("Abmelden"),
+          title: Text("Log Out"),
           onTap: () {
             FirestoreManager().LogOut(context);
             Navigator.pushAndRemoveUntil(

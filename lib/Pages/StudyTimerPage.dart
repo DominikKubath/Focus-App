@@ -135,7 +135,8 @@ class _StudyTimerPageState extends State<StudyTimerPage> {
     var userId = await FirestoreManager().ReadUid(context);
     if(userId != null)
     {
-      ScoreManager().UpdateTodaysScore(30, userId);
+       ScoreManager().UpdateTodaysScore(ScoreManager.scoreCollectionName, 30, userId);
+      ScoreManager().UpdateTodaysScore(ScoreManager.timerStatsCollectionName, 1, userId);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Timer ran out!    +30 Productivity Points!'),

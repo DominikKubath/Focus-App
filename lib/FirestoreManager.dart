@@ -14,6 +14,7 @@ import 'package:studienarbeit_focus_app/Classes/UserInfo.dart';
 import 'Classes/Attempt.dart';
 import 'Classes/FlashCard.dart';
 import 'Classes/FlashCardDeck.dart';
+import 'Classes/FlashCardStatistic.dart';
 import 'Classes/ToDoItem.dart';
 import 'Classes/Utils.dart';
 
@@ -24,7 +25,286 @@ class FirestoreManager {
   static const String flashCardDecksCollectionName = "flashcards";
   static const String flashCardContentCollectionName = "content";
   static const String flashCardAttemptCollectionName = "attempts";
-  
+
+  static const String flashCardsStatsCollectionName = "allFlashcardsStats";
+  static const String deckStatsCollectionName = "stats";
+
+  void UpdateFlashCardStats(int count, String fieldName, String uid) async
+  {
+    var userDoc = await FirestoreManager().GetCurrentUser(uid);
+    if (userDoc != null) {
+      try {
+        DateTime today = DateTime.now();
+        FlashCardStatistic? todayScore = await GetTodaysFlashCardsStats(uid);
+        if (todayScore == null) {
+          CreateTodaysCardStatsIfNotExisting(uid, fieldName, count);
+        } else {
+          int updatedAmount = 0;
+          if(fieldName == "attemptsCount")
+          {
+            updatedAmount = todayScore.attemptCount + count;
+          }
+          else
+          {
+            updatedAmount = todayScore.learnedCards + count;
+          }
+          await userCollection
+              .doc(userDoc.id)
+              .collection(flashCardsStatsCollectionName)
+              .doc(todayScore.docId)
+              .update({fieldName: updatedAmount});
+        }
+      } catch (e) {
+        print("Error updating today's score: $e");
+      }
+    }
+  }
+
+  Future<FlashCardStatistic?> GetTodaysFlashCardsStats(String uid) async
+  {
+    var userDoc = await FirestoreManager().GetCurrentUser(uid);
+    if(userDoc != null)
+    {
+      try {
+        DateTime today = DateTime.now();
+        DateTime startOfToday = DateTime(today.year, today.month, today.day);
+        QuerySnapshot querySnapshot = await userCollection
+            .doc(userDoc.id)
+            .collection(flashCardsStatsCollectionName)
+            .where(FlashCardStatistic.dateFieldName, isGreaterThanOrEqualTo: Timestamp.fromDate(startOfToday))
+            .where(FlashCardStatistic.dateFieldName, isLessThan: Timestamp.fromDate(startOfToday.add(Duration(days: 1))))
+            .limit(1)
+            .get();
+
+        debugPrint(FlashCardStatistic.fromDoc(querySnapshot.docs.first).docId);
+        if (querySnapshot.docs.isNotEmpty) {
+          return FlashCardStatistic.fromDoc(querySnapshot.docs.first);
+        } else {
+          return null;
+        }
+      } catch (e) {
+        print("Error fetching today's score: $e");
+        return null;
+      }
+    }
+  }
+
+  Future<List<FlashCardStatistic>?> GetCardsStatsOfLastSevenDays(String uid) async
+  {
+    var userDoc = await FirestoreManager().GetCurrentUser(uid);
+    if (userDoc != null) {
+      try {
+        DateTime today = DateTime.now();
+        DateTime sevenDaysAgo = today.subtract(Duration(days: 7));
+
+        QuerySnapshot querySnapshot = await userCollection
+            .doc(userDoc.id)
+            .collection(flashCardsStatsCollectionName)
+            .where(FlashCardStatistic.dateFieldName, isGreaterThanOrEqualTo: Timestamp.fromDate(sevenDaysAgo))
+            .where(FlashCardStatistic.dateFieldName, isLessThan: Timestamp.fromDate(today))
+            .orderBy(FlashCardStatistic.dateFieldName, descending: true)
+            .get();
+
+        List<FlashCardStatistic> cardStats = querySnapshot.docs.map((doc) => FlashCardStatistic.fromDoc(doc)).toList();
+
+        // Check for missing dates and add dummy scores
+        for (int i = 0; i <= 7; i++) {
+          DateTime dateToCheck = today.subtract(Duration(days: i));
+          bool dateExists = cardStats.any((score) => score.date.toDate().year == dateToCheck.year && score.date.toDate().month == dateToCheck.month && score.date.toDate().day == dateToCheck.day);
+          if (!dateExists) {
+            // Create a dummy score with amount 0 for missing date
+            FlashCardStatistic dummyStat = FlashCardStatistic.empty();
+            dummyStat.docId = '';
+            dummyStat.date = Timestamp.fromDate(dateToCheck);
+            dummyStat.attemptCount = 0;
+            dummyStat.learnedCards = 0;
+            cardStats.add(dummyStat);
+          }
+        }
+
+        // Sort the list by date
+        cardStats.sort((a, b) => a.date.compareTo(b.date));
+        return cardStats;
+      } catch (e) {
+        print("Error fetching scores of last seven days: $e");
+        return null;
+      }
+    }
+  }
+
+  void CreateTodaysCardStatsIfNotExisting(String uid, String fieldName, int initialAmount) async {
+    var userDoc = await FirestoreManager().GetCurrentUser(uid);
+    if (userDoc != null) {
+      try {
+        DateTime today = DateTime.now();
+        DateTime startOfToday = DateTime(today.year, today.month, today.day);
+        FlashCardStatistic? todayScore = await GetTodaysFlashCardsStats(uid);
+        if (todayScore == null) {
+          if(fieldName == "attemptsCount")
+          {
+            await userCollection.doc(userDoc.id).collection(flashCardsStatsCollectionName).add({
+              fieldName: initialAmount,
+              "learnedCards" : 0,
+              FlashCardStatistic.dateFieldName: Timestamp.fromDate(startOfToday)
+            });
+          }
+          else
+          {
+            await userCollection.doc(userDoc.id).collection(flashCardsStatsCollectionName).add({
+              fieldName: initialAmount,
+              "attemptsCount" : 0,
+              FlashCardStatistic.dateFieldName: Timestamp.fromDate(startOfToday)
+            });
+          }
+        }
+      } catch (e) {
+        print("Error creating today's score: $e");
+      }
+    }
+  }
+
+
+
+  void UpdateDeckStats(int count, String fieldName, String deckId, String uid) async
+  {
+    var userDoc = await FirestoreManager().GetCurrentUser(uid);
+    if (userDoc != null) {
+      try {
+        DateTime today = DateTime.now();
+        FlashCardStatistic? todayScore = await GetTodaysDeckStats(deckId, uid);
+        if (todayScore == null) {
+          CreateTodaysDeckStatsIfNotExisting(uid, deckId, fieldName, count);
+        } else {
+          int updatedAmount = 0;
+          if(fieldName == "attemptsCount")
+          {
+            updatedAmount = todayScore.attemptCount + count;
+          }
+          else
+          {
+            updatedAmount = todayScore.learnedCards + count;
+          }
+          await userCollection
+              .doc(userDoc.id)
+              .collection(flashCardsStatsCollectionName)
+              .doc(todayScore.docId)
+              .update({fieldName: updatedAmount});
+        }
+      } catch (e) {
+        print("Error updating today's score: $e");
+      }
+    }
+  }
+
+  Future<FlashCardStatistic?> GetTodaysDeckStats(String deckId, String uid) async
+  {
+    var userDoc = await FirestoreManager().GetCurrentUser(uid);
+    if(userDoc != null)
+    {
+      try {
+        DateTime today = DateTime.now();
+        DateTime startOfToday = DateTime(today.year, today.month, today.day);
+        QuerySnapshot querySnapshot = await userCollection
+            .doc(userDoc.id)
+            .collection(flashCardDecksCollectionName)
+            .doc(deckId)
+            .collection(deckStatsCollectionName)
+            .where(FlashCardStatistic.dateFieldName, isGreaterThanOrEqualTo: Timestamp.fromDate(startOfToday))
+            .where(FlashCardStatistic.dateFieldName, isLessThan: Timestamp.fromDate(startOfToday.add(Duration(days: 1))))
+            .limit(1)
+            .get();
+
+        debugPrint(FlashCardStatistic.fromDoc(querySnapshot.docs.first).docId);
+        if (querySnapshot.docs.isNotEmpty) {
+          return FlashCardStatistic.fromDoc(querySnapshot.docs.first);
+        } else {
+          return null;
+        }
+      } catch (e) {
+        print("Error fetching today's score: $e");
+        return null;
+      }
+    }
+  }
+
+  Future<List<FlashCardStatistic>?> GetDeckStatsOfLastSevenDays(String deckId, String uid) async
+  {
+    var userDoc = await FirestoreManager().GetCurrentUser(uid);
+    if (userDoc != null) {
+      try {
+        DateTime today = DateTime.now();
+        DateTime sevenDaysAgo = today.subtract(Duration(days: 7));
+
+        QuerySnapshot querySnapshot = await userCollection
+            .doc(userDoc.id)
+            .collection(flashCardDecksCollectionName)
+            .doc(deckId)
+            .collection(deckStatsCollectionName)
+            .where(FlashCardStatistic.dateFieldName, isGreaterThanOrEqualTo: Timestamp.fromDate(sevenDaysAgo))
+            .where(FlashCardStatistic.dateFieldName, isLessThan: Timestamp.fromDate(today))
+            .orderBy(FlashCardStatistic.dateFieldName, descending: true)
+            .get();
+
+        List<FlashCardStatistic> cardStats = querySnapshot.docs.map((doc) => FlashCardStatistic.fromDoc(doc)).toList();
+
+        // Check for missing dates and add dummy scores
+        for (int i = 0; i <= 7; i++) {
+          DateTime dateToCheck = today.subtract(Duration(days: i));
+          bool dateExists = cardStats.any((score) => score.date.toDate().year == dateToCheck.year && score.date.toDate().month == dateToCheck.month && score.date.toDate().day == dateToCheck.day);
+          if (!dateExists) {
+            // Create a dummy score with amount 0 for missing date
+            FlashCardStatistic dummyStat = FlashCardStatistic.empty();
+            dummyStat.docId = '';
+            dummyStat.date = Timestamp.fromDate(dateToCheck);
+            dummyStat.attemptCount = 0;
+            dummyStat.learnedCards = 0;
+            cardStats.add(dummyStat);
+          }
+        }
+
+        // Sort the list by date
+        cardStats.sort((a, b) => a.date.compareTo(b.date));
+        return cardStats;
+      } catch (e) {
+        print("Error fetching scores of last seven days: $e");
+        return null;
+      }
+    }
+  }
+
+  void CreateTodaysDeckStatsIfNotExisting(String uid, String deckId, String fieldName, int initialAmount) async {
+    var userDoc = await FirestoreManager().GetCurrentUser(uid);
+    if (userDoc != null) {
+      try {
+        DateTime today = DateTime.now();
+        DateTime startOfToday = DateTime(today.year, today.month, today.day);
+        FlashCardStatistic? todayScore = await GetTodaysDeckStats(deckId, uid);
+        if (todayScore == null) {
+          if(fieldName == "attemptsCount")
+          {
+            await userCollection.doc(userDoc.id).collection(flashCardDecksCollectionName).doc(deckId).collection(deckStatsCollectionName).add({
+              fieldName: initialAmount,
+              "learnedCards" : 0,
+              FlashCardStatistic.dateFieldName: Timestamp.fromDate(startOfToday)
+            });
+          }
+          else
+          {
+            await userCollection.doc(userDoc.id).collection(flashCardDecksCollectionName).doc(deckId).collection(deckStatsCollectionName).add({
+              fieldName: initialAmount,
+              "attemptsCount" : 0,
+              FlashCardStatistic.dateFieldName: Timestamp.fromDate(startOfToday)
+            });
+          }
+        }
+      } catch (e) {
+        print("Error creating today's score: $e");
+      }
+    }
+  }
+
+
+
 
   Future<List<FlashCardDeck>> GetAllFlashCardDecks(String uid) async
   {
@@ -96,6 +376,16 @@ class FirestoreManager {
     var user = await GetCurrentUser(uid);
     userCollection.doc(user.id).collection(flashCardDecksCollectionName).doc(deckId)
         .collection(flashCardContentCollectionName).doc(flashCardId).collection(flashCardAttemptCollectionName).add(attempt.ToMap());
+    if(attempt.status == LastStatus.Easy)
+    {
+      UpdateFlashCardStats(1, FlashCardStatistic.learnedCardsFieldName, uid);
+      UpdateDeckStats(1, FlashCardStatistic.learnedCardsFieldName, deckId, uid);
+    }
+    else
+    {
+      UpdateFlashCardStats(1, FlashCardStatistic.attemptCountFieldName, uid);
+      UpdateDeckStats(1, FlashCardStatistic.attemptCountFieldName, deckId, uid);
+    }
   }
 
   Future<List<Attempt>> GetAllAttemptsOfFlashCard(String deckId, String flashCardDocId, String uid) async

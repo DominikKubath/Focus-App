@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:studienarbeit_focus_app/Classes/FlashCardStatistic.dart';
 import 'package:studienarbeit_focus_app/Classes/TodoStatistic.dart';
 import 'package:studienarbeit_focus_app/UI%20Elements/MenuDrawer.dart';
 
@@ -21,6 +22,8 @@ class _HomePageState extends State<HomePage> {
   late Future<FSUser> userData;
   late Future<List<Score>?> scoreData;
   late Future<List<TodoStatistic>?> todoStats;
+  late Future<List<FlashCardStatistic>?> cardStats;
+  late Future<List<Score>?> timerStats;
 
   @override
   void initState() {
@@ -32,6 +35,8 @@ class _HomePageState extends State<HomePage> {
     userData = _getUserData();
     scoreData = _getScoreData();
     todoStats = _getTodoStats();
+    cardStats = _getFlashCardStats();
+    timerStats = _getTimerStats();
 
     return Scaffold(
       appBar: AppBar(
@@ -110,59 +115,6 @@ class _HomePageState extends State<HomePage> {
 
   }
 
-  Widget _buildScoreChart(List<Score>? scores) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Welcome back!',
-            style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white
-            ),
-          ),
-          SizedBox(height: 20),
-          Text(
-            'Your Productivity Points The Past Week:',
-            style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white
-            ),
-          ),
-          SizedBox(height: 20),
-          scores != null
-              ? ScoreStatsWidget(scores: scores)
-              : Text('No scores available'),
-          SizedBox(height: 20), // Add some space between the headline and TodoStatsWidget
-          Text(
-            'Your ToDo Statistics:',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          FutureBuilder(
-            future: todoStats,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else {
-                List<TodoStatistic>? todoStatsData = snapshot.data as List<TodoStatistic>?;
-                return TodoStatsWidget(todoStats: todoStatsData ?? []);
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
 
   Future<FSUser> _getUserData() async {
     String? userId = await FirestoreManager().ReadUid(context);
@@ -176,7 +128,7 @@ class _HomePageState extends State<HomePage> {
   Future<List<Score>?> _getScoreData() async {
     String? userId = await FirestoreManager().ReadUid(context);
     if (userId != null) {
-      return ScoreManager().GetScoresOfLastSevenDays(userId);
+      return ScoreManager().GetScoresOfLastSevenDays(ScoreManager.scoreCollectionName, userId);
     }
     return null;
   }
@@ -186,6 +138,24 @@ class _HomePageState extends State<HomePage> {
     String? userId = await FirestoreManager().ReadUid(context);
     if (userId != null) {
       return ToDoManager().GetTodoStatsOfLastSevenDays(userId);
+    }
+    return null;
+  }
+
+  Future<List<FlashCardStatistic>?> _getFlashCardStats() async
+  {
+    String? userId = await FirestoreManager().ReadUid(context);
+    if (userId != null) {
+      return FirestoreManager().GetCardsStatsOfLastSevenDays(userId);
+    }
+    return null;
+  }
+
+  Future<List<Score>?> _getTimerStats() async
+  {
+    String? userId = await FirestoreManager().ReadUid(context);
+    if (userId != null) {
+      return ScoreManager().GetScoresOfLastSevenDays(ScoreManager.timerStatsCollectionName, userId);
     }
     return null;
   }
