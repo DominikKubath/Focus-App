@@ -98,15 +98,24 @@ class ScoreManager {
             .orderBy(Score.dateFieldName, descending: true)
             .get();
 
-        CreateTodaysScoreIfNotExisting(userDoc.id, 0);
-
         List<Score> scores = querySnapshot.docs.map((doc) => Score.fromDoc(doc)).toList();
 
-        // Add today's score to the list if it exists
-        Score? todayScore = await GetTodaysScore(uid);
-        if (todayScore != null) {
-          scores.add(todayScore);
+        // Check for missing dates and add dummy scores
+        for (int i = 0; i < 7; i++) {
+          DateTime dateToCheck = today.subtract(Duration(days: i));
+          bool dateExists = scores.any((score) => score.date.toDate().year == dateToCheck.year && score.date.toDate().month == dateToCheck.month && score.date.toDate().day == dateToCheck.day);
+          if (!dateExists) {
+            // Create a dummy score with amount 0 for missing date
+            Score dummyScore = Score.empty();
+            dummyScore.docId = '';
+            dummyScore.date = Timestamp.fromDate(dateToCheck);
+            dummyScore.amount = 0;
+            scores.add(dummyScore);
+          }
         }
+
+        // Sort the list by date
+        scores.sort((a, b) => a.date.compareTo(b.date));
 
         return scores;
       } catch (e) {
@@ -115,5 +124,7 @@ class ScoreManager {
       }
     }
   }
+
+
 
 }
