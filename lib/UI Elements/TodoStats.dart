@@ -1,19 +1,19 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../Classes/Score.dart';
+import '../Classes/TodoStatistic.dart';
 
-class ScoreStatsWidget extends StatelessWidget {
-  final List<Score> scores;
+class TodoStatsWidget extends StatelessWidget {
+  final List<TodoStatistic> todoStats;
 
-  const ScoreStatsWidget({Key? key, required this.scores}) : super(key: key);
+  const TodoStatsWidget({Key? key, required this.todoStats}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return _buildLineChart(scores);
+    return _buildLineChart(todoStats);
   }
 
-  Widget _buildLineChart(List<Score> scores) {
+  Widget _buildLineChart(List<TodoStatistic> todoStats) {
     List<Color> gradientColors = [
       Colors.cyan,
       Colors.blue,
@@ -44,28 +44,8 @@ class ScoreStatsWidget extends StatelessWidget {
           child: LineChart(
             LineChartData(
               lineBarsData: [
-                LineChartBarData(
-                  spots: scores
-                      .asMap()
-                      .entries
-                      .map((entry) =>
-                      FlSpot(entry.key.toDouble(), entry.value.amount.toDouble()))
-                      .toList(),
-                  isCurved: false,
-                  barWidth: 4,
-                  isStrokeCapRound: true,
-                  belowBarData: BarAreaData(
-                    show: true,
-                    gradient: LinearGradient(
-                      colors: gradientColors
-                          .map((color) => color.withOpacity(0.3))
-                          .toList(),
-                    ),
-                  ),
-                  gradient: LinearGradient(
-                    colors: gradientColors,
-                  ),
-                ),
+                lineChartBarData1_1,
+                lineChartBarData1_2
               ],
               titlesData: FlTitlesData(
                 rightTitles: const AxisTitles(
@@ -78,7 +58,7 @@ class ScoreStatsWidget extends StatelessWidget {
                   axisNameWidget: Text(
                     'Date',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 14,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -92,11 +72,10 @@ class ScoreStatsWidget extends StatelessWidget {
                 ),
                 leftTitles: AxisTitles(
                   axisNameWidget: Text(
-                    'Productivity Points',
+                    'ToDo Count -> Done Todos (Blue) - Created Todos (Yellow)',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   sideTitles: SideTitles(
@@ -117,6 +96,118 @@ class ScoreStatsWidget extends StatelessWidget {
       ),
     );
   }
+
+
+
+  List<LineChartBarData> get lineBarsData1 => [
+    lineChartBarData1_1,
+    lineChartBarData1_2,
+  ];
+
+  LineChartBarData get lineChartBarData1_1 => LineChartBarData(
+    isCurved: false,
+    color: Colors.amber,
+    barWidth: 8,
+    isStrokeCapRound: true,
+    dotData: const FlDotData(show: false),
+    belowBarData: BarAreaData(show: false),
+    spots: todoStats
+        .asMap()
+        .entries
+        .map((entry) =>
+        FlSpot(entry.key.toDouble(), entry.value.createdTodos.toDouble()))
+        .toList(),
+  );
+
+  LineChartBarData get lineChartBarData1_2 => LineChartBarData(
+    isCurved: false,
+    color: Colors.blue,
+    barWidth: 8,
+    isStrokeCapRound: true,
+    dotData: const FlDotData(show: false),
+    belowBarData: BarAreaData(
+      show: false,
+    ),
+    spots: todoStats
+        .asMap()
+        .entries
+        .map((entry) =>
+        FlSpot(entry.key.toDouble(), entry.value.completedThatDay.toDouble()))
+        .toList(),
+  );
+
+  FlTitlesData get titlesData1 => FlTitlesData(
+      bottomTitles: AxisTitles(
+        axisNameWidget: Text(
+          'Date',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    rightTitles: const AxisTitles(
+      sideTitles: SideTitles(showTitles: false),
+    ),
+    topTitles: const AxisTitles(
+      sideTitles: SideTitles(showTitles: false),
+    ),
+    leftTitles: AxisTitles(
+      axisNameWidget: Text(
+        'ToDo Count -> Completed Todos (Blue) - Created Todos (Yellow)',
+        style: TextStyle(
+          fontSize: 10,
+          color: Colors.white,
+        ),
+      ),
+      sideTitles: SideTitles(
+        showTitles: true,
+        interval: 1,
+        getTitlesWidget: leftTitleWidgets,
+        reservedSize: 42,
+      ),
+    ),
+  );
+
+  LineChartData get sampleData1 => LineChartData(
+    lineTouchData: lineTouchData1,
+    gridData: gridData,
+    titlesData: titlesData1,
+    borderData: borderData,
+    lineBarsData: lineBarsData1,
+    minX: 0,
+    maxX: 14,
+    maxY: 4,
+    minY: 0,
+  );
+
+  SideTitles get bottomTitles => SideTitles(
+    showTitles: true,
+    reservedSize: 32,
+    interval: 1,
+    getTitlesWidget: bottomTitleWidgets,
+  );
+
+  FlGridData get gridData => const FlGridData(show: false);
+
+  LineTouchData get lineTouchData1 => LineTouchData(
+    handleBuiltInTouches: true,
+    touchTooltipData: LineTouchTooltipData(
+      getTooltipColor: (touchedSpot) => Colors.blueGrey.withOpacity(0.8),
+    ),
+  );
+
+  FlBorderData get borderData => FlBorderData(
+    show: true,
+    border: Border(
+      bottom: const BorderSide(color: Colors.transparent),
+      left: const BorderSide(color: Colors.transparent),
+      right: const BorderSide(color: Colors.transparent),
+      top: const BorderSide(color: Colors.transparent),
+    ),
+  );
+
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
@@ -150,14 +241,14 @@ class ScoreStatsWidget extends StatelessWidget {
       color: Colors.white,
     );
     String text;
-    if (value < 5) {
-      if (value.toInt() % 5 == 0) {
+    if (value <= 5) {
+      if (value.toInt() % 1 == 0) {
         text = '${value.toInt()}';
       } else {
         return Container();
       }
     } else {
-      if (value.toInt() % 30 == 0) {
+      if (value.toInt() % 2 == 0) {
         text = '${value.toInt()}';
       } else {
         return Container();
@@ -166,4 +257,9 @@ class ScoreStatsWidget extends StatelessWidget {
 
     return Text(text, style: style, textAlign: TextAlign.left);
   }
+
 }
+
+
+
+

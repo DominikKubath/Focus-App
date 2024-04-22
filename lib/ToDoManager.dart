@@ -125,6 +125,49 @@ class ToDoManager {
     }
   }
 
+  Future<List<TodoStatistic>?> GetTodoStatsOfLastSevenDays(String uid) async
+  {
+    var userDoc = await FirestoreManager().GetCurrentUser(uid);
+    if (userDoc != null) {
+      try {
+        DateTime today = DateTime.now();
+        DateTime sevenDaysAgo = today.subtract(Duration(days: 7));
+
+        QuerySnapshot querySnapshot = await userCollection
+            .doc(userDoc.id)
+            .collection(todoStatsCollectionName)
+            .where(TodoStatistic.dateFieldName, isGreaterThanOrEqualTo: Timestamp.fromDate(sevenDaysAgo))
+            .where(TodoStatistic.dateFieldName, isLessThan: Timestamp.fromDate(today))
+            .orderBy(TodoStatistic.dateFieldName, descending: true)
+            .get();
+
+        List<TodoStatistic> todoStats = querySnapshot.docs.map((doc) => TodoStatistic.fromDoc(doc)).toList();
+
+        // Check for missing dates and add dummy scores
+        for (int i = 0; i <= 7; i++) {
+          DateTime dateToCheck = today.subtract(Duration(days: i));
+          bool dateExists = todoStats.any((score) => score.date.toDate().year == dateToCheck.year && score.date.toDate().month == dateToCheck.month && score.date.toDate().day == dateToCheck.day);
+          if (!dateExists) {
+            // Create a dummy score with amount 0 for missing date
+            TodoStatistic dummyStat = TodoStatistic.empty();
+            dummyStat.docId = '';
+            dummyStat.date = Timestamp.fromDate(dateToCheck);
+            dummyStat.createdTodos = 0;
+            dummyStat.completedThatDay = 0;
+            todoStats.add(dummyStat);
+          }
+        }
+
+        // Sort the list by date
+        todoStats.sort((a, b) => a.date.compareTo(b.date));
+        return todoStats;
+      } catch (e) {
+        print("Error fetching scores of last seven days: $e");
+        return null;
+      }
+    }
+  }
+
   void CreateTodaysTodoStatsIfNotExisting(String uid, String fieldName, int initialAmount) async {
     var userDoc = await FirestoreManager().GetCurrentUser(uid);
     if (userDoc != null) {
