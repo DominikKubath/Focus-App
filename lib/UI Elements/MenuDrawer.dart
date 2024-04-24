@@ -126,13 +126,6 @@ class MenuDrawer extends StatelessWidget {
           },
         ),
         ListTile(
-          title: Text('Calendar'),
-          onTap: () {
-            // Handle item 2 click
-            Navigator.pop(context); // Close the drawer
-          },
-        ),
-        ListTile(
           title: Text('Study Timer'),
           onTap: () {
             Navigator.push(

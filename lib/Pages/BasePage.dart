@@ -46,7 +46,6 @@ class _HomePageState extends State<HomePage> {
         title: Text('Home Page'),
       ),
       drawer: MenuDrawer(),
-      backgroundColor: Colors.black87,
       body: Scrollbar(
         controller: _scrollController,
         child: Padding(
@@ -104,7 +103,6 @@ class _HomePageState extends State<HomePage> {
                                         style: TextStyle(
                                           fontSize: 24,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
                                         ),
                                       ),
                                       SizedBox(height: 50),
@@ -113,7 +111,6 @@ class _HomePageState extends State<HomePage> {
                                         style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
                                         ),
                                       ),
                                       SizedBox(height: 50),
@@ -126,7 +123,6 @@ class _HomePageState extends State<HomePage> {
                                         style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
                                         ),
                                       ),
                                       SizedBox(height: 50),
@@ -138,7 +134,6 @@ class _HomePageState extends State<HomePage> {
                                         style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
                                         ),
                                       ),
                                       SizedBox(height: 50),
@@ -151,7 +146,6 @@ class _HomePageState extends State<HomePage> {
                                         style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white,
                                         ),
                                       ),
                                       SizedBox(height: 20),

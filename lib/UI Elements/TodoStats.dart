@@ -27,12 +27,7 @@ class TodoStatsWidget extends StatelessWidget {
     return AspectRatio(
       aspectRatio: 5,
       child: Padding(
-        padding: const EdgeInsets.only(
-          left: 12,
-          right: 28,
-          top: 22,
-          bottom: 12,
-        ),
+        padding: const EdgeInsets.all(20),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -49,10 +44,16 @@ class TodoStatsWidget extends StatelessWidget {
               ],
               titlesData: FlTitlesData(
                 rightTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 40,
+                  ),
                 ),
                 topTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 40,
+                  ),
                 ),
                 bottomTitles: AxisTitles(
                   axisNameWidget: Text(
@@ -65,7 +66,7 @@ class TodoStatsWidget extends StatelessWidget {
                   ),
                   sideTitles: SideTitles(
                     showTitles: true,
-                    reservedSize: 30,
+                    reservedSize: 40,
                     interval: 1,
                     getTitlesWidget: bottomTitleWidgets,
                   ),
@@ -82,7 +83,7 @@ class TodoStatsWidget extends StatelessWidget {
                     showTitles: true,
                     interval: 1,
                     getTitlesWidget: leftTitleWidgets,
-                    reservedSize: 42,
+                    reservedSize: 50,
                   ),
                 ),
               ),
@@ -148,10 +149,16 @@ class TodoStatsWidget extends StatelessWidget {
         ),
       ),
     rightTitles: const AxisTitles(
-      sideTitles: SideTitles(showTitles: false),
+      sideTitles: SideTitles(
+        showTitles: true,
+        reservedSize: 40,
+      ),
     ),
     topTitles: const AxisTitles(
-      sideTitles: SideTitles(showTitles: false),
+      sideTitles: SideTitles(
+        showTitles: true,
+        reservedSize: 40,
+      ),
     ),
     leftTitles: AxisTitles(
       axisNameWidget: Text(
