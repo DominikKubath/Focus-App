@@ -33,7 +33,11 @@ class CreateAccountPageState extends State<CreateAccountPage> {
       Container(
         width: screenWidth,
         margin: EdgeInsets.fromLTRB(0, 0, 0, 60),
-        child: Text("Willkommen!", style: GoogleFonts.montserrat(fontSize: 48), textAlign: TextAlign.center,),),
+        child: Text("Welcome!", style: GoogleFonts.montserrat(fontSize: 48), textAlign: TextAlign.center,),),
+      Container(
+        width: screenWidth,
+        margin: EdgeInsets.fromLTRB(40, 0, 0, 0),
+        child: Text("Name", style: GoogleFonts.montserrat(fontSize: 14, color: Colors.black)),),
       Container(
           margin: EdgeInsets.fromLTRB(40, 0, 40, 0),
           child: TextFormField(
@@ -60,21 +64,21 @@ class CreateAccountPageState extends State<CreateAccountPage> {
       Container(
         width: screenWidth,
         margin: EdgeInsets.fromLTRB(40, 20, 0, 0),
-        child: Text(isPasswordValid ? "Passwort" : "Passwort (!)", style: GoogleFonts.montserrat(fontSize: 14, color: isPasswordValid ? Colors.black : Colors.red)),),
+        child: Text(isPasswordValid ? "Password" : "Password (!)", style: GoogleFonts.montserrat(fontSize: 14, color: isPasswordValid ? Colors.black : Colors.red)),),
       Container(
           margin: EdgeInsets.fromLTRB(40, 0, 40, 0),
           child: TextFormField(controller: passwordController,
               decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: isPasswordValid ? BorderSide(color: Colors.black) : BorderSide(color: Colors.red)),
-                  hintText: "Sicheres Passwort eingeben", hintStyle: GoogleFonts.montserrat(color: Colors.grey)), obscureText: true)),
+                  hintText: "Enter A Secure Password", hintStyle: GoogleFonts.montserrat(color: Colors.grey)), obscureText: true)),
       Container(
         width: screenWidth,
         margin: EdgeInsets.fromLTRB(40, 20, 0, 0),
-        child: Text(arePasswordsEqual ? "Passwort bestätigen" : "Passwort bestätigen (!)", style: GoogleFonts.montserrat(fontSize: 14, color: arePasswordsEqual ? Colors.black : Colors.red)),),
+        child: Text(arePasswordsEqual ? "Confirm Password" : "Confirm Password (!)", style: GoogleFonts.montserrat(fontSize: 14, color: arePasswordsEqual ? Colors.black : Colors.red)),),
       Container(
           margin: EdgeInsets.fromLTRB(40, 0, 40, 0),
           child: TextFormField(controller: passwordConfirmationController,
               decoration: InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: arePasswordsEqual ? BorderSide(color: Colors.black) : BorderSide(color: Colors.red)),
-                  hintText: "Passwort erneut eingeben", hintStyle: GoogleFonts.montserrat(color: Colors.grey)), obscureText: true)),
+                  hintText: "Enter Your Password Again", hintStyle: GoogleFonts.montserrat(color: Colors.grey)), obscureText: true)),
       Container(margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),  width: screenWidth * 0.75,
           child: ElevatedButton(
               style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Utils().getColorFromHex("FF7A3D")), shape: MaterialStateProperty.all( RoundedRectangleBorder(
@@ -139,7 +143,7 @@ class CreateAccountPageState extends State<CreateAccountPage> {
                   debugPrint("Something" + error.toString());
                 });
               },
-              child: Text("Weiter", style: GoogleFonts.montserrat(fontSize: 14),))),
+              child: Text("Continue", style: GoogleFonts.montserrat(fontSize: 14),))),
     ])
     );
   }

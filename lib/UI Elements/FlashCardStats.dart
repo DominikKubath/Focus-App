@@ -21,14 +21,14 @@ class FlashCardStatsWidget extends StatelessWidget {
     ];
 
     List<Color> backgroundGradientColors = [
-      Color(0xFF1E1E1E), // Dark grey
-      Color(0xFF121212), // Darker grey
+      Color(0x83D3D3D3), // Dark grey
+      Color(0x83CBCBCB), // Darker grey
     ];
 
     return AspectRatio(
       aspectRatio: 5,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(10),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -52,7 +52,7 @@ class FlashCardStatsWidget extends StatelessWidget {
                 ),
                 topTitles: const AxisTitles(
                   sideTitles: SideTitles(
-                    showTitles: true,
+                    showTitles: false,
                     reservedSize: 40,
                   ),
                 ),
@@ -61,7 +61,6 @@ class FlashCardStatsWidget extends StatelessWidget {
                     'Date',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -77,7 +76,6 @@ class FlashCardStatsWidget extends StatelessWidget {
                     'Card Count -> Learned Cards (Blue) - Card Attempts (Yellow)',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.white,
                     ),
                   ),
                   sideTitles: SideTitles(
@@ -144,23 +142,15 @@ class FlashCardStatsWidget extends StatelessWidget {
         'Date',
         style: TextStyle(
           fontSize: 12,
-          color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
       ),
-    ),
-    rightTitles: const AxisTitles(
-      sideTitles: SideTitles(showTitles: false),
-    ),
-    topTitles: const AxisTitles(
-      sideTitles: SideTitles(showTitles: false),
     ),
     leftTitles: AxisTitles(
       axisNameWidget: Text(
         'Card Count -> Learned Cards (Blue) - Card Attempts (Yellow)',
         style: TextStyle(
           fontSize: 10,
-          color: Colors.white,
         ),
       ),
       sideTitles: SideTitles(
@@ -214,7 +204,6 @@ class FlashCardStatsWidget extends StatelessWidget {
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontSize: 16,
-      color: Colors.white,
     );
     Widget text;
     // Calculate the date for the last seven days based on the value
@@ -240,17 +229,16 @@ class FlashCardStatsWidget extends StatelessWidget {
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontSize: 15,
-      color: Colors.white,
     );
     String text;
-    if (value <= 5) {
-      if (value.toInt() % 1 == 0) {
+    if (value <= 10) {
+      if (value.toInt() % 5 == 0) {
         text = '${value.toInt()}';
       } else {
         return Container();
       }
     } else {
-      if (value.toInt() % 2 == 0) {
+      if (value.toInt() % 10 == 0) {
         text = '${value.toInt()}';
       } else {
         return Container();

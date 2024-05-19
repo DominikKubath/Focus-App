@@ -69,10 +69,6 @@ class _ToDoItemWidgetState extends State<ToDoItemWidget> {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          /*IconButton(
-            icon: const Icon(Icons.edit, color: ColorPalette.funcBlue),
-            onPressed: () => EditToDoDialog.showEditDialog(context, widget.title, widget.description, widget.id, widget.priority),
-          ),*/
           IconButton(
             icon: const Icon(Icons.delete, color: ColorPalette.funcBlue),
             onPressed: () => DeleteConfirmationDialog.DeleteToDoItem(context, widget.id),

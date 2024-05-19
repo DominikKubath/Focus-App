@@ -281,6 +281,8 @@ class CreateNewDeckButton extends StatelessWidget {
         onPressed: () {
           _showCreateDeckDialog(context);
         },
+        style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.greenAccent),foregroundColor: MaterialStateProperty.all(Colors.white)),
         child: Text('Create New Deck'),
       ),
     );
@@ -329,6 +331,8 @@ class CreateNewDeckButton extends StatelessWidget {
                   // Handle error
                 }
               },
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.greenAccent),foregroundColor: MaterialStateProperty.all(Colors.white)),
               child: Text('Create Deck'),
             ),
           ],

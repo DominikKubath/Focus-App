@@ -79,7 +79,7 @@ class MenuDrawer extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                             fontSize: 32,
-                          ),
+                          ), textAlign: TextAlign.center,
                         );
                       },
                     ),

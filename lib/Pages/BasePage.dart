@@ -46,9 +46,7 @@ class _HomePageState extends State<HomePage> {
         title: Text('Home Page'),
       ),
       drawer: MenuDrawer(),
-      body: Scrollbar(
-        controller: _scrollController,
-        child: Padding(
+      body: Padding(
           padding: const EdgeInsets.all(20.0), // Add padding for better spacing
           child: FutureBuilder(
             future: scoreData,
@@ -105,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(height: 50),
+                                      SizedBox(height: 40),
                                       Text(
                                         'Your Productivity Points The Past Week:',
                                         style: TextStyle(
@@ -113,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(height: 50),
+                                      SizedBox(height: 20),
                                       scores != null
                                           ? ScoreStatsWidget(scores: scores)
                                           : Text('No scores available'),
@@ -125,7 +123,7 @@ class _HomePageState extends State<HomePage> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(height: 50),
+                                      SizedBox(height: 20),
                                       // Add your TodoStatsWidget here
                                       TodoStatsWidget(todoStats: todoStats ?? []),
                                       SizedBox(height: 50),
@@ -136,7 +134,7 @@ class _HomePageState extends State<HomePage> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(height: 50),
+                                      SizedBox(height: 20),
                                       // Add your FlashCardStatsWidget here
                                       FlashCardStatsWidget(
                                           flashCardStats: cardStats ?? []),
@@ -166,7 +164,6 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ),
-      ),
     );
 
   }

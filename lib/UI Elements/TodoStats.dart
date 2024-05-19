@@ -20,14 +20,14 @@ class TodoStatsWidget extends StatelessWidget {
     ];
 
     List<Color> backgroundGradientColors = [
-      Color(0xFF1E1E1E), // Dark grey
-      Color(0xFF121212), // Darker grey
+      Color(0x83D3D3D3), // Dark grey
+      Color(0x83CBCBCB), // Darker grey
     ];
 
     return AspectRatio(
       aspectRatio: 5,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(10),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -51,7 +51,7 @@ class TodoStatsWidget extends StatelessWidget {
                 ),
                 topTitles: const AxisTitles(
                   sideTitles: SideTitles(
-                    showTitles: true,
+                    showTitles: false,
                     reservedSize: 40,
                   ),
                 ),
@@ -60,7 +60,6 @@ class TodoStatsWidget extends StatelessWidget {
                     'Date',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -76,7 +75,6 @@ class TodoStatsWidget extends StatelessWidget {
                     'ToDo Count -> Done Todos (Blue) - Created Todos (Yellow)',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.white,
                     ),
                   ),
                   sideTitles: SideTitles(
@@ -143,7 +141,6 @@ class TodoStatsWidget extends StatelessWidget {
           'Date',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -165,7 +162,6 @@ class TodoStatsWidget extends StatelessWidget {
         'ToDo Count -> Completed Todos (Blue) - Created Todos (Yellow)',
         style: TextStyle(
           fontSize: 10,
-          color: Colors.white,
         ),
       ),
       sideTitles: SideTitles(
@@ -219,7 +215,6 @@ class TodoStatsWidget extends StatelessWidget {
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontSize: 16,
-      color: Colors.white,
     );
     Widget text;
     // Calculate the date for the last seven days based on the value
@@ -245,7 +240,6 @@ class TodoStatsWidget extends StatelessWidget {
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontSize: 15,
-      color: Colors.white,
     );
     String text;
     if (value <= 5) {

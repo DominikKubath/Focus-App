@@ -57,7 +57,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
                   // If index is within the range of the data list, display ToDoItemWidget
                   ToDoItem item = snapshot.data![index];
                   return Padding(
-                    padding: const EdgeInsets.only(top: 50, left: 70, right: 70, bottom: 10),
+                    padding: const EdgeInsets.only(top: 30, left: 70, right: 70, bottom: 10),
                     child: ToDoItemWidget(
                       title: item.name,
                       id: item.id,
@@ -99,6 +99,8 @@ class CreateNewToDoButton extends StatelessWidget {
           CreateNewToDoDialog.show(context); // Call the show method of the dialog
         },
         child: Text('Create new ToDo'),
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(Colors.greenAccent),foregroundColor: MaterialStateProperty.all(Colors.white)),
       ),
     );
   }

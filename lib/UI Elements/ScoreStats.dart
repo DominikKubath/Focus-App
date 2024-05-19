@@ -20,14 +20,14 @@ class ScoreStatsWidget extends StatelessWidget {
     ];
 
     List<Color> backgroundGradientColors = [
-      Color(0xFF1E1E1E), // Dark grey
-      Color(0xFF121212), // Darker grey
+      Color(0x83D3D3D3), // Dark grey
+      Color(0x83CBCBCB), // Darker grey
     ];
 
     return AspectRatio(
       aspectRatio: 5,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(10),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -71,7 +71,7 @@ class ScoreStatsWidget extends StatelessWidget {
                   ),
                 topTitles: const AxisTitles(
                   sideTitles: SideTitles(
-                    showTitles: true,
+                    showTitles: false,
                     reservedSize: 40,
                   ),
                 ),
@@ -80,7 +80,6 @@ class ScoreStatsWidget extends StatelessWidget {
                     'Date',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -96,7 +95,6 @@ class ScoreStatsWidget extends StatelessWidget {
                     'Productivity Points',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -122,14 +120,13 @@ class ScoreStatsWidget extends StatelessWidget {
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontSize: 16,
-      color: Colors.white,
     );
     Widget text;
     // Calculate the date for the last seven days based on the value
     final DateTime now = DateTime.now();
     final List<String> dates = [];
     for (int i = 7; i >= 0; i--) {
-      final DateTime date = now.subtract(Duration(days: i));
+      final DateTime date = now.subtract(Duration(days: i-1));
       final String formattedDate =
           '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}';
       dates.add(formattedDate);
@@ -148,7 +145,6 @@ class ScoreStatsWidget extends StatelessWidget {
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontSize: 15,
-      color: Colors.white,
     );
     String text;
     if (value < 5) {

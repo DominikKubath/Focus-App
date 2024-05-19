@@ -32,7 +32,7 @@ class LoginPageState extends State<LoginPage> {
               Container(
                 width: screenWidth,
                 margin: EdgeInsets.fromLTRB(0, 0, 0, 60),
-                child: Text("Willkommen zurück!",
+                child: Text("Welcome back!",
                   style: GoogleFonts.montserrat(fontSize: 48),
                   textAlign: TextAlign.center,),),
               Container(
@@ -50,17 +50,17 @@ class LoginPageState extends State<LoginPage> {
                 width: screenWidth,
                 margin: EdgeInsets.fromLTRB(40, 20, 0, 0),
                 child: Text(
-                    "Passwort", style: GoogleFonts.montserrat(fontSize: 14)),),
+                    "Password", style: GoogleFonts.montserrat(fontSize: 14)),),
               Container(
                   margin: EdgeInsets.fromLTRB(40, 0, 40, 0),
                   child: TextFormField(controller: passwordController,
-                      decoration: InputDecoration(hintText: "Dein Passwort",
+                      decoration: InputDecoration(hintText: "Your Password",
                           hintStyle: GoogleFonts.montserrat(
                               color: Colors.grey)), obscureText: true)),
               if(isInvalid) Container(
                 width: screenWidth,
                 margin: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                child: Text("Login fehlgeschlagen",
+                child: Text("Login failed",
                     style: GoogleFonts.montserrat(
                         fontSize: 14, color: Colors.red)),),
               Container(
@@ -97,7 +97,7 @@ class LoginPageState extends State<LoginPage> {
                         debugPrint(emailController.text + " " +
                             passwordController.text);
                       },
-                      child: Text("Anmelden"))),
+                      child: Text("Login"))),
             ],
           )
       );
